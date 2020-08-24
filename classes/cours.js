@@ -28,13 +28,13 @@ function secondesToHeure(secondes){
 }
 
 function getSecondesByMultiplier(coordX){
-    return  (-0.0000000000000240554) * Math.pow(coordX, 7)
-            + 0.0000000000563162 * Math.pow(coordX, 6)
-            + (-0.000000043126) * Math.pow(coordX, 5)
-            + 0.00000630924 * Math.pow(coordX, 4)
-            + 0.00728924 * Math.pow(coordX, 3)
-            + (-3.69793) * Math.pow(coordX, 2)
-            + 678.77 * coordX - 11216.7
+    if(coordX > 365   && coordX < 366  ){return 43200}
+    if(coordX > 596.5 && coordX < 597.5){return 57600}
+    
+    return  0.00000019513359 * Math.pow(coordX, 4)
+            + (-0.0003723993) * Math.pow(coordX, 3)
+            + 0.2325723439 * Math.pow(coordX, 2)
+            + 7.6856610283 * coordX + 25028.095126
 }
 
 
