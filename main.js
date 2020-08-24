@@ -16,7 +16,7 @@ bot.on('ready', () => {
         if (err) return console.log(err)
         data.pages[0].content.forEach(function(element){
             if(element.x < 65){ //Titre d'une semaine
-                console.log("Ajoute semaine " + element.str)
+                console.log("[|] Ajoute semaine " + element.str)
 
                 const regex = RegExp("U[1-4]/*")
                 let debutLigne = 0
@@ -34,7 +34,7 @@ bot.on('ready', () => {
                                     console.log(`Modif Cours : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getTitre()} `
                                         + `-> Ajoute Lieu : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getLieu()}`)
                                 }else{
-                                    console.warn("WARN - Lieu : " + elem.str)
+                                    console.warn("/!\\ WARN - Lieu : " + elem.str)
                                 }
                             }else{ //Création du cours
                                 if(semaine.getDernierJour().getDernierCours()){
@@ -50,7 +50,7 @@ bot.on('ready', () => {
                                 console.log(`Modif Cours : ${semaine.getDernierJour().getCoursParDebut(elem.x).getTitre()} `
                                     + `-> Ajoute Prof : ${semaine.getDernierJour().getCoursParDebut(elem.x).getProf()}`)
                             }else{
-                                console.warn("WARN - Prof : " + elem.str)
+                                console.warn("/!\\ WARN - Prof : " + elem.str)
                             }
                         }
                     }
@@ -58,7 +58,7 @@ bot.on('ready', () => {
             }
            
         })
-        //console.log(data.pages[0].content);
+        console.log(data/*.pages[0].content*/);
     })
 
 })
