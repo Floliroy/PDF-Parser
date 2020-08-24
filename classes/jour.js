@@ -1,5 +1,10 @@
 const Cours = require('./cours.js')
 
+const redNode = "\x1b[31m"
+const blueNode = "\x1b[36m"
+const resetNode = "\x1b[0m"
+
+
 const listeJours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"]
 
 module.exports = class Jour{
@@ -11,7 +16,7 @@ module.exports = class Jour{
         this.#nom = nom
         this.#coordY = coordY
         if(!listeJours.includes(nom)){
-            console.warn(`Le jour '${nom}' est inconnu !`)
+            console.log(redNode, `/!\\ WARNING - Le jour '${nom}' est inconnu !`, resetNode)
         }
     }
     getNom(){

@@ -8,6 +8,10 @@ const pdfExtract = new PDFExtract()
 
 const Semaine = require('./classes/semaine.js')
 
+const redNode = "\x1b[31m"
+const blueNode = "\x1b[36m"
+const resetNode = "\x1b[0m"
+
 bot.on('ready', () => {
     console.log(`Logged in as ${bot.user.tag}!`)
 
@@ -16,7 +20,7 @@ bot.on('ready', () => {
         if (err) return console.log(err)
         data.pages[0].content.forEach(function(element){
             if(element.x < 65){ //Titre d'une semaine
-                console.log("[|] Ajoute semaine " + element.str)
+                console.log(blueNode, "[|] Ajoute semaine " + element.str, resetNode)
 
                 const regex = RegExp("U[1-4]/*")
                 let debutLigne = 0
@@ -24,17 +28,20 @@ bot.on('ready', () => {
                 data.pages[0].content.forEach(function(elem){
                     if(elem.y >= element.y-1 && elem.y <= element.y+85){
                         if(elem.x > 104 && elem.fontName == "g_d0_f6"){ //Cours ou Lieu dans le tableau
-                            if(elem.y - debutLigne > 18){
-                                semaine.addJour(element.y)
-                                debutLigne = element.y
+                            if(elem.y - debutLigne >= 18){
+                                semaine.addJour(elem.y)
+                                debutLigne = elem.y
                             }
-                            if(regex.test(elem.str)){ //Ajout du lieu
+
+                            if(regex.test(elem.str.slice(0,2))){ //Ajout du lieu
                                 if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x)){
                                     semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).setLieu(elem.str)
                                     console.log(`Modif Cours : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getTitre()} `
                                         + `-> Ajoute Lieu : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getLieu()}`)
                                 }else{
-                                    console.warn("/!\\ WARN - Lieu : " + elem.str)
+                                    console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
+                                    console.log(elem)
+                                    console.log()
                                 }
                             }else{ //Création du cours
                                 if(semaine.getDernierJour().getDernierCours()){
@@ -50,7 +57,9 @@ bot.on('ready', () => {
                                 console.log(`Modif Cours : ${semaine.getDernierJour().getCoursParDebut(elem.x).getTitre()} `
                                     + `-> Ajoute Prof : ${semaine.getDernierJour().getCoursParDebut(elem.x).getProf()}`)
                             }else{
-                                console.warn("/!\\ WARN - Prof : " + elem.str)
+                                console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
+                                console.log(elem)
+                                console.log()
                             }
                         }
                     }
@@ -58,7 +67,7 @@ bot.on('ready', () => {
             }
            
         })
-        console.log(data/*.pages[0].content*/);
+        //console.log(data.pages[0].content);
     })
 
 })
