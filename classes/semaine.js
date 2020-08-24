@@ -28,4 +28,11 @@ module.exports = class Semaine{
             return element.getStartCoordY() <= coordY && element.getEndCoordY() >= coordY
         })
     }
+
+    print(){
+        console.log(`Semaine du ${this.#nom} :`)
+        this.#jours.forEach(function(jour){
+            jour.print()
+        })
+    }
 }

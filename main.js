@@ -12,10 +12,12 @@ const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
 const resetNode = "\x1b[0m"
 
+let semaines = new Array()
 bot.on('ready', () => {
     console.log(`Logged in as ${bot.user.tag}!`)
 
     const options = {}
+    
     pdfExtract.extract('EDT.pdf', options, (err, data) => {
         if (err) return console.log(err)
         data.pages[0].content.forEach(function(element){
@@ -33,29 +35,32 @@ bot.on('ready', () => {
                                 debutLigne = elem.y
                             }
 
-                            if(regex.test(elem.str.slice(0,2))){ //Ajout du lieu
+                            if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
                                 if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x)){
                                     semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).setLieu(elem.str)
-                                    console.log(`Modif Cours : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getTitre()} `
-                                        + `-> Ajoute Lieu : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getLieu()}`)
+                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).setEndOfCase(elem.x + elem.width)
+                                    /*console.log(`Modif Cours : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getTitre()} `
+                                        + `-> Ajoute Lieu : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getLieu()}`)*/
                                 }else{
                                     console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
                                     console.log(elem)
                                     console.log()
                                 }
+
                             }else{ //Création du cours
                                 if(semaine.getDernierJour().getDernierCours()){
                                     semaine.getDernierJour().getDernierCours().setNextCoordX(elem.x)
                                 }
                                 semaine.getDernierJour().addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
-                                console.log(`New Cours : '${semaine.getDernierJour().getDernierCours().getTitre()}'`)
+                                /*console.log(`New Cours : '${semaine.getDernierJour().getDernierCours().getTitre()}'`)*/
                             }
                         }
+
                         if(elem.x > 104 && elem.fontName == "g_d0_f7"){ //Prof dans le tableau
                             if(semaine.getDernierJour() && semaine.getDernierJour().getCoursParDebut(elem.x)){
                                 semaine.getDernierJour().getCoursParDebut(elem.x).setProf(elem.str)
-                                console.log(`Modif Cours : ${semaine.getDernierJour().getCoursParDebut(elem.x).getTitre()} `
-                                    + `-> Ajoute Prof : ${semaine.getDernierJour().getCoursParDebut(elem.x).getProf()}`)
+                                /*console.log(`Modif Cours : ${semaine.getDernierJour().getCoursParDebut(elem.x).getTitre()} `
+                                    + `-> Ajoute Prof : ${semaine.getDernierJour().getCoursParDebut(elem.x).getProf()}`)*/
                             }else{
                                 console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
                                 console.log(elem)
@@ -64,17 +69,20 @@ bot.on('ready', () => {
                         }
                     }
                 })
+                semaines.push(semaine)
             }
            
         })
-        //console.log(data.pages[0].content);
-    })
+    })  
 
 })
 
 bot.on('message', msg => {
     if (msg.content === 'ping') {
         msg.reply('Pong!')
+        semaines.forEach(function(semaine){
+            semaine.print()
+        })
     }
 })
 

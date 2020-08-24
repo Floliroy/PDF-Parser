@@ -23,10 +23,10 @@ module.exports = class Jour{
         return this.#nom
     }
     getStartCoordY(){
-        return this.#coordY
+        return this.#coordY - 0.75
     }
     getEndCoordY(){
-        return this.#coordY + 18.5
+        return this.#coordY + 18.75
     }
 
     addCours(titre, coordX, coordY, width, height){
@@ -49,6 +49,13 @@ module.exports = class Jour{
     getCoursEntreCoord(coordX){
         return this.#cours.find(element => {
             return element.getStartCoordX() <= coordX && element.getNextCoordX() > coordX
+        })
+    }
+
+    print(){
+        console.log(`   ${this.#nom} :`)
+        this.#cours.forEach(function(cours){
+            cours.print()
         })
     }
 }
