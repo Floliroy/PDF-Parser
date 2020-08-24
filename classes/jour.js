@@ -26,7 +26,7 @@ module.exports = class Jour{
         return this.#coordY - 0.75
     }
     getEndCoordY(){
-        return this.#coordY + 18.75
+        return this.#coordY + 18
     }
 
     addCours(titre, coordX, coordY, width, height){
@@ -46,10 +46,23 @@ module.exports = class Jour{
             return element.getEndCoordX() == coordX
         })
     }
-    getCoursEntreCoord(coordX){
+    getCoursEntreCoord(coordX, coordY){
         return this.#cours.find(element => {
-            return element.getStartCoordX() <= coordX && element.getNextCoordX() > coordX
+            if(this.isDoubleCours(coordX)){
+                return element.getStartCoordX() <= coordX && element.getNextCoordX() > coordX && (element.getStartCoordY()-1 < coordY && element.getStartCoordY()+1 > coordY)
+            }else{
+                return element.getStartCoordX() <= coordX && element.getNextCoordX() > coordX
+            }
         })
+    }
+    isDoubleCours(coordX){
+        let cpt = 0
+        this.#cours.forEach(function(cours){
+            if(cours.getStartCoordX() <= coordX && cours.getNextCoordX() > coordX){
+                cpt++
+            }
+        })
+        return cpt > 1
     }
 
     print(){

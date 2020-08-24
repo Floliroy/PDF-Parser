@@ -25,7 +25,7 @@ module.exports = class Semaine{
 
     getJourEntreCoord(coordY){
         return this.#jours.find(element => {
-            return element.getStartCoordY() <= coordY && element.getEndCoordY() >= coordY
+            return element.getStartCoordY() <= coordY && element.getEndCoordY() > coordY
         })
     }
 

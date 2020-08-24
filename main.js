@@ -36,10 +36,10 @@ bot.on('ready', () => {
                             }
 
                             if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
-                                if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x)){
-                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).setLieu(elem.str)
+                                if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)){
+                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y).setLieu(elem.str)
                                     let endOfCase = elem.width > 14 ? elem.x + elem.width : elem.x + elem.width/2 + 19
-                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).setEndOfCase(endOfCase)
+                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y).setEndOfCase(endOfCase)
                                     /*console.log(`Modif Cours : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getTitre()} `
                                         + `-> Ajoute Lieu : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getLieu()}`)*/
                                 }else{
