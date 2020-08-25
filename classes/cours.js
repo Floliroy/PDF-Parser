@@ -27,9 +27,10 @@ function secondesToHeure(secondes){
     return `${hour}:${min}`
 }
 
-function getSecondesByMultiplier(coordX){
-    if(coordX > 365   && coordX < 366  ){return 43200}
-    if(coordX > 596.5 && coordX < 597.5){return 57600}
+function getSecondesByCoord(coordX){
+    if(coordX > 367-3 && coordX < 367+3){return 43200}
+    if(coordX > 439-3 && coordX < 439+3){return 49500}
+    if(coordX > 597-3 && coordX < 597+3){return 57600}
     
     return  0.00000019513359 * Math.pow(coordX, 4)
             + (-0.0003723993) * Math.pow(coordX, 3)
@@ -74,10 +75,10 @@ module.exports = class Cours{
     }
 
     getHeureDebut(){
-        return secondesToHeure(getSecondesByMultiplier(this.#coordX))
+        return secondesToHeure(getSecondesByCoord(this.#coordX))
     }
     getHeureFin(){
-        return secondesToHeure(getSecondesByMultiplier(this.#endOfCase))
+        return secondesToHeure(getSecondesByCoord(this.#endOfCase))
     }
 
     print(){
