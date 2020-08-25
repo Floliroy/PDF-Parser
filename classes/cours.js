@@ -109,9 +109,9 @@ module.exports = class Cours{
             this.#titre = titre.trim()
         }
 
-        if(titre == "Sport"){
+        /*if(titre == "Sport"){
             this.#coursIng = true
-        }
+        }*/
 
         this.#coordX = coordX
         this.#coordY = coordY
