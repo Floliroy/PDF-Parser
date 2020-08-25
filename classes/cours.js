@@ -63,6 +63,10 @@ module.exports = class Cours{
     #lieu = ""
     /** Indique si c'est une évaluation -> EVOL : Trouver l'info utile */
     #evaluation = false
+    /** Indique si c'est un cours juste pour les ingénieurs */
+    #coursIng
+    /** Indique si c'est un cours juste pour les alternants */
+    #coursAlt
 
     /** Coordonnée X du titre du cours */
     #coordX = 0
@@ -105,6 +109,10 @@ module.exports = class Cours{
             this.#titre = titre.trim()
         }
 
+        if(titre == "Sport"){
+            this.#coursIng = true
+        }
+
         this.#coordX = coordX
         this.#coordY = coordY
         this.#width  = width
@@ -128,7 +136,8 @@ module.exports = class Cours{
      * Affiche les infos utiles du cours
      */
     print(){
-        console.log(`       [${this.getHeureDebut()}${this.getEndOfCase() ? " - " + this.getHeureFin() : ""}]`)
+        console.log(`       [${this.getHeureDebut()}${this.getEndOfCase() ? " - " + this.getHeureFin() : ""}]`
+                            + `${this.#coursAlt ? " - Alternant" : ""}${this.#coursIng ? " - Ingénieur" : ""}`)
         console.log(`       ${this.#titre}${this.#lieu ? " - " + this.#lieu : ""}${this.#prof ? " (" + this.#prof + ")" : ""}`)
     }
 
@@ -158,6 +167,12 @@ module.exports = class Cours{
     }
     isEvaluation(){
         return this.#evaluation
+    }
+    setCoursIng(coursIng){
+        this.#coursIng = coursIng
+    }
+    setCoursAlt(coursAlt){
+        this.#coursAlt = coursAlt
     }
 
     getStartCoordX(){

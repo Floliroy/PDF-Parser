@@ -40,9 +40,17 @@ bot.on('ready', () => {
 
                             if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
                                 if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)){
-                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y).setLieu(elem.str)
-                                    let endOfCase = elem.width > 14 ? elem.x + elem.width : elem.x + elem.width/2 + 19
-                                    semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y).setEndOfCase(endOfCase)
+                                    let coursModif = semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
+                                    coursModif.setLieu(elem.str)
+                                    coursModif.setEndOfCase(elem.width > 14 ? elem.x + elem.width : elem.x + elem.width/2 + 19)
+
+                                    if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
+                                        if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
+                                            coursModif.setCoursIng(true)
+                                        }else{
+                                            coursModif.setCoursAlt(true)
+                                        }
+                                    }
                                 }else{
                                     console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
                                     console.log(elem)
@@ -59,7 +67,10 @@ bot.on('ready', () => {
 
                         if(elem.x > 104 && elem.fontName == "g_d0_f7"){ //Prof dans le tableau
                             if(semaine.getDernierJour() && semaine.getDernierJour().getCoursParDebut(elem.x)){
-                                semaine.getDernierJour().getCoursParDebut(elem.x).setProf(elem.str)
+                                let coursModif = semaine.getDernierJour().getCoursParDebut(elem.x)
+                                coursModif.setProf(elem.str)
+                                coursModif.setCoursIng(false)
+                                coursModif.setCoursAlt(false)
                             }else{
                                 console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
                                 console.log(elem)
