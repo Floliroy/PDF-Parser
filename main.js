@@ -24,13 +24,16 @@ bot.on('ready', () => {
             if(element.x < 65){ //Titre d'une semaine
                 console.log(blueNode, "[|] Ajoute semaine " + element.str, resetNode)
 
+                //On initialise notre semaine
                 const regex = RegExp("U[1-4]/*")
                 let debutLigne = 0
                 let semaine = new Semaine(element.str)
                 data.pages[0].content.forEach(function(elem){
+                    //On reboucle pour chercher les infos utiles a notre semaine
                     if(elem.y >= element.y-1 && elem.y <= element.y+85){
                         if(elem.x > 104 && elem.fontName == "g_d0_f6"){ //Cours ou Lieu dans le tableau
-                            if(elem.y - debutLigne >= 18){
+
+                            if(elem.y - debutLigne >= 18){ //On est passé a une nouvelle ligne
                                 semaine.addJour(elem.y)
                                 debutLigne = elem.y
                             }
@@ -40,8 +43,6 @@ bot.on('ready', () => {
                                     semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y).setLieu(elem.str)
                                     let endOfCase = elem.width > 14 ? elem.x + elem.width : elem.x + elem.width/2 + 19
                                     semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y).setEndOfCase(endOfCase)
-                                    /*console.log(`Modif Cours : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getTitre()} `
-                                        + `-> Ajoute Lieu : ${semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x).getLieu()}`)*/
                                 }else{
                                     console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
                                     console.log(elem)
@@ -53,15 +54,12 @@ bot.on('ready', () => {
                                     semaine.getDernierJour().getDernierCours().setNextCoordX(elem.x)
                                 }
                                 semaine.getDernierJour().addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
-                                /*console.log(`New Cours : '${semaine.getDernierJour().getDernierCours().getTitre()}'`)*/
                             }
                         }
 
                         if(elem.x > 104 && elem.fontName == "g_d0_f7"){ //Prof dans le tableau
                             if(semaine.getDernierJour() && semaine.getDernierJour().getCoursParDebut(elem.x)){
                                 semaine.getDernierJour().getCoursParDebut(elem.x).setProf(elem.str)
-                                /*console.log(`Modif Cours : ${semaine.getDernierJour().getCoursParDebut(elem.x).getTitre()} `
-                                    + `-> Ajoute Prof : ${semaine.getDernierJour().getCoursParDebut(elem.x).getProf()}`)*/
                             }else{
                                 console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
                                 console.log(elem)
@@ -70,6 +68,7 @@ bot.on('ready', () => {
                         }
                     }
                 })
+                //On ajoute la semaine a notre liste de semaines
                 semaines.push(semaine)
             }
            
