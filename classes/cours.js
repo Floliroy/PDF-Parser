@@ -172,8 +172,14 @@ module.exports = class Cours{
     setCoursIng(coursIng){
         this.#coursIng = coursIng
     }
+    isCoursIng(){
+        return this.#coursIng
+    }
     setCoursAlt(coursAlt){
         this.#coursAlt = coursAlt
+    }
+    isCoursAlt(){
+        return this.#coursAlt
     }
 
     getStartCoordX(){

@@ -1,6 +1,7 @@
 const Jour = require('./jour.js')
 
 const listeJours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"]
+const listeMois  = ["janv", "fev", "mars", "avril", "mai", "juin", "juill", "août", "sept", "oct", "nov", "dec"]
 
 module.exports = class Semaine{
     /** Le nom de la semaine */
@@ -16,7 +17,7 @@ module.exports = class Semaine{
      * @param {*} nom Nom souhaité
      */
     constructor(nom){
-        this.#nom = nom
+        this.#nom = nom.trim()
     }
 
     /**
@@ -24,6 +25,33 @@ module.exports = class Semaine{
      */
     getNom(){
         return this.#nom
+    }
+    /**
+     * Getter sur la liste des jours
+     */
+    getJours(){
+        return this.#jours
+    }
+    /**
+     * Récupère le numéro du mois actuel
+     */
+    getNumeroMois(){
+        let cpt = 1
+        let semaine = this
+        let retour
+        listeMois.forEach(function(mois){
+            if(semaine.getNom().endsWith(mois)){
+                retour = cpt < 10 ? `0${cpt}` : cpt
+            }
+            cpt++
+        })
+        return retour
+    }
+    /**
+     * Récupère le numéro du premier jour de la semaine
+     */
+    getNumeroPremierJourSemaine(){
+        return parseInt(this.#nom.slice(0,2))
     }
     /**
      * Ajoute un nouveau jour en l'initialisant correctement

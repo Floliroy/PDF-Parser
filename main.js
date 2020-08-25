@@ -1,11 +1,28 @@
 require('dotenv').config()
 
+/**
+ * Discord globals
+ */
 const Discord = require('discord.js')
 const bot = new Discord.Client()
 
+/**
+ * PDF extract globals
+ */
 const PDFExtract = require('pdf.js-extract').PDFExtract
 const pdfExtract = new PDFExtract()
 
+/**
+ * Google globals
+ */
+const Config = require('./config/settings.js');
+const CalendarAPI = require('node-google-calendar');
+let cal = new CalendarAPI(Config); 
+const calendarId = Config.calendarId["primary"] 
+
+/**
+ * Personnal globals
+ */
 const Semaine = require('./classes/semaine.js')
 
 const redNode = "\x1b[31m"
@@ -13,12 +30,12 @@ const blueNode = "\x1b[36m"
 const resetNode = "\x1b[0m"
 
 let semaines = new Array()
-bot.on('ready', () => {
+bot.on("ready", () => {
     console.log(`Logged in as ${bot.user.tag}!`)
 
     const options = {}
     
-    pdfExtract.extract('EDT.pdf', options, (err, data) => {
+    pdfExtract.extract("EDT.pdf", options, (err, data) => {
         if (err) return console.log(err)
         data.pages[0].content.forEach(function(element){
             if(element.x < 65){ //Titre d'une semaine
@@ -87,12 +104,36 @@ bot.on('ready', () => {
     })  
 
 })
-
-bot.on('message', msg => {
-    if (msg.content === 'ping') {
-        msg.reply('Pong!')
-        semaines.forEach(function(semaine){
+    
+bot.on("message", msg => {
+    if (msg.content === "ping") {
+        msg.reply("Pong!")
+        /*semaines.forEach(function(semaine){
             semaine.print()
+        })*/
+        let semaine = semaines[0]
+        let cptJour = 0
+        semaine.getJours().forEach(function(jour){
+            jour.getCours().forEach(function(cours){
+                if(!cours.isCoursIng()){
+                    let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
+                    numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
+    
+                    let event = {
+                        "summary": cours.getTitre(),
+                        "description": cours.getProf(),
+                        "location": cours.getLieu(),
+                        "start": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureDebut()}:00+02:00`},
+                        "end": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureFin()}:00+02:00`}
+                    }
+                    cal.Events.insert(calendarId, event).then(() => {
+                        console.log("Insert ", cours.getTitre());
+                    }).catch(err => {
+                        console.log(redNode, "/!\\ WARNING - Insertion Evenement", resetNode);
+                    })
+                }
+            })
+            cptJour++
         })
     }
 })

@@ -110,4 +110,7 @@ module.exports = class Jour{
     getEndCoordY(){
         return this.#coordY + 18
     }
+    getCours(){
+        return this.#cours
+    }
 }
