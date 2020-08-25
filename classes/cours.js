@@ -44,6 +44,7 @@ function secondesToHeure(secondes){
 function getSecondesByCoord(coordX){
     //On gère nos exceptions 
     if(coordX > 367-3 && coordX < 367+3){return 43200}
+    if(coordX > 422-3 && coordX < 422+3){return 48600}
     if(coordX > 439-3 && coordX < 439+3){return 49500}
     if(coordX > 597-3 && coordX < 597+3){return 57600}
     
