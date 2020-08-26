@@ -38,26 +38,52 @@ const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
 const resetNode = "\x1b[0m"
 
+/**
+ * Ajoute des jours a la date
+ */
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+/**
+ * Quand le bot démarre
+ */
 bot.on("ready", () => {
     console.log(`Logged in as ${bot.user.tag}!`)
     extractDatas()
 })
 
+
+
 async function deleteGoogleCalendar(){
-    let semaine = semaines[0]
-    let numeroJour = semaine.getNumeroPremierJourSemaine()
+    let numeroJour = semaines[0].getNumeroPremierJourSemaine()
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
     let params = {
-        timeMin: `2020-${semaine.getNumeroMois()}-${numeroJour}T00:00:00+02:00`,
-        maxResults: 1000
+        timeMin: `2020-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+02:00`,
+        showDeleted: false,
+        maxResults: 2500
     }
     
-	await cal.Events.list(calendarId, params).then(json => {
+	return await cal.Events.list(calendarId, params).then(json => {
+        console.log(json.length)
         json.forEach(async function(json){
-            if(!json.summary.startsWith("Rendre ")){
+            if(json.description == "#Generated"){
                 let redo = false
                 do{
-                    await cal.Events.delete(calendarId, json.id, {}).catch(err => redo = true)
+                    await cal.Events.delete(calendarId, json.id, {})
+                        .then(resp => console.log("Delete Ok"))
+                        .catch(err => {
+                            let jsonErr = JSON.parse(err.message)
+                            redo = false
+                            if(jsonErr.error.statusCode == "403(Forbidden)"){
+                                redo = true
+                            }else{
+                                console.log("Delete Not Ok")
+                                //console.log(jsonErr)
+                            }
+                        })
                 }while(redo)
             }
         })
@@ -67,33 +93,40 @@ async function deleteGoogleCalendar(){
     })
 }
 async function insertGoogleCalendar(){
-    let semaine = semaines[0]
-    let cptJour = 0
-    await semaine.getJours().forEach(function(jour){
-        jour.getCours().forEach(async function(cours){
-            if(!cours.isCoursIng()){
-                let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
-                numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
+    semaines.forEach(async function(semaine){
+        let cptJour = 0
+        return await semaine.getJours().forEach(function(jour){
+            jour.getCours().forEach(async function(cours){
+                if(!cours.isCoursIng()){
+                    let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
 
-                let event = {
-                    "summary": cours.getTitre(),
-                    "description": cours.getProf(),
-                    "location": cours.getLieu(),
-                    "start": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureDebut()}:00+02:00`},
-                    "end": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureFin()}:00+02:00`}
+                    let date = new Date(2020, semaine.getNumeroMois()-1, numeroJour)
+                    date.addDays(cptJour)
+
+                    let month = date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1
+                    let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+
+                    let event = {
+                        "summary": `${cours.getTitre()}${cours.getProf() ? " - " + cours.getProf() : ""}`,
+                        "description": "#Generated",
+                        "location": cours.getLieu(),
+                        "start": {"dateTime": `2020-${month}-${day}T${cours.getHeureDebut()}:00+02:00`},
+                        "end": {"dateTime": `2020-${month}-${day}T${cours.getHeureFin()}:00+02:00`}
+                    }
+
+                    await cal.Events.insert(calendarId, event)
+                        .then(resp => console.log("Insert Ok"))
+                        .catch(err => console.log(event, JSON.parse(err.message)))
                 }
-                await cal.Events.insert(calendarId, event).catch(err => {
-                    console.log(redNode, "/!\\ WARNING - Insertion Evenement", resetNode)
-                })
-            }
+            })
+            cptJour++
         })
-        cptJour++
     })
 }
 
 async function updateGoogleCalendar(){
     try{
-        await deleteGoogleCalendar()
+        //await deleteGoogleCalendar()
         console.log(blueNode, "Events Deleted", resetNode)
         await insertGoogleCalendar()
         console.log(blueNode, "Events Updated", resetNode)
@@ -149,14 +182,16 @@ async function downloadAndCollectDatas(){
                             if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
                                 if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)){
                                     let coursModif = semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
-                                    coursModif.setLieu(elem.str)
-                                    coursModif.setEndOfCase(elem.width > 14 ? elem.x + elem.width : elem.x + elem.width/2 + 19)
-
-                                    if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
-                                        if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
-                                            coursModif.setCoursIng(true)
-                                        }else{
-                                            coursModif.setCoursAlt(true)
+                                    if(!coursModif.getLieu()){
+                                        coursModif.setLieu(elem.str)
+                                        coursModif.setEndOfCase(elem.width > 14 ? (elem.x + elem.width) : (elem.x + elem.width/2 + 19))
+    
+                                        if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
+                                            if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
+                                                coursModif.setCoursIng(true)
+                                            }else{
+                                                coursModif.setCoursAlt(true)
+                                            }
                                         }
                                     }
                                 }else{

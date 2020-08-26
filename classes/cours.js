@@ -21,8 +21,8 @@ function getClosest(min){
  * Permet de transformer un temps en seconde au format HH:MM
  * @param {*} secondes Le temps en seconde à transformer
  */
-function secondesToHeure(secondes){
-    let hour  = Math.floor(secondes / 3600)
+function secondesToHeure(secondes, addHour){
+    let hour  = Math.floor(secondes / 3600) + addHour
     let min = Math.floor((secondes - (hour * 3600)) / 60)
     
     min = getClosest(min)
@@ -96,14 +96,14 @@ module.exports = class Cours{
      * @param {*} height Hauteur
      */
     constructor(titre, coordX, coordY, width, height){
-        const regexDeux  = RegExp("/* - [A-Z][A-Z]")
         const regexTrois = RegExp("/* - [A-Z][A-Z][A-Z]")
-        if(regexDeux.test(titre)){ //Prof avec deux lettres
-            this.#prof = titre.slice(-2).trim()
-            this.#titre = titre.slice(0, -5).trim()
-        }else if(regexTrois.test(titre)){ //Prof avec trois lettres
+        const regexDeux  = RegExp("/* - [A-Z][A-Z]")
+        if(regexTrois.test(titre)){ //Prof avec trois lettres
             this.#prof = titre.slice(-3).trim()
             this.#titre = titre.slice(0, -6).trim()
+        }else if(regexDeux.test(titre)){ //Prof avec deux lettres
+            this.#prof = titre.slice(-2).trim()
+            this.#titre = titre.slice(0, -5).trim()
         }else if(titre.endsWith(" - ")){ //Fin inutile
             this.#titre = titre.slice(0, -3).trim()
         }else{
@@ -124,13 +124,17 @@ module.exports = class Cours{
      * Récupère l'heure de début du cours
      */
     getHeureDebut(){
-        return secondesToHeure(getSecondesByCoord(this.#coordX))
+        return secondesToHeure(getSecondesByCoord(this.#coordX), 0)
     }
     /**
      * Récupère l'heure de fin du cours
      */
     getHeureFin(){
-        return secondesToHeure(getSecondesByCoord(this.#endOfCase))
+        if(this.getEndOfCase()){
+            return secondesToHeure(getSecondesByCoord(this.#endOfCase), 0)
+        }else{
+            return secondesToHeure(getSecondesByCoord(this.#coordX), 2)
+        }
     }
 
     /**
