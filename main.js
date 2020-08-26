@@ -43,6 +43,12 @@ bot.on("ready", () => {
     extractDatas()
 })
 
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}   
+
 async function deleteGoogleCalendar(){
     let semaine = semaines[0]
     let numeroJour = semaine.getNumeroPremierJourSemaine()
@@ -55,7 +61,10 @@ async function deleteGoogleCalendar(){
 	await cal.Events.list(calendarId, params).then(json => {
         json.forEach(async function(json){
             if(!json.summary.startsWith("Rendre ")){
-                await cal.Events.delete(calendarId, json.id, {})
+                let redo = false
+                do{
+                    await cal.Events.delete(calendarId, json.id, {}).catch(err => redo = true)
+                }while(redo)
             }
         })
     }).catch(err => {
