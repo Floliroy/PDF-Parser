@@ -15,7 +15,8 @@
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
     "node-google-calendar": "^1.1.1",
-    "pdf.js-extract": "^0.1.4"
+    "pdf.js-extract": "^0.1.4",
+    "request-promise-native": "^1.0.9"
   },
   "devDependencies": {
     "nodemon": "^2.0.4"

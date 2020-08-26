@@ -13,11 +13,18 @@ const PDFExtract = require('pdf.js-extract').PDFExtract
 const pdfExtract = new PDFExtract()
 
 /**
+ * Request globals
+ */
+const fs = require("fs")
+const request = require("request-promise-native")
+const urlPdf ="https://transformation-digitale.info/media/aaoun/EDT/EDT_STRI2A_M1RT.pdf"
+
+/**
  * Google globals
  */
-const Config = require('./config/settings.js');
-const CalendarAPI = require('node-google-calendar');
-let cal = new CalendarAPI(Config); 
+const Config = require('./config/settings.js')
+const CalendarAPI = require('node-google-calendar')
+let cal = new CalendarAPI(Config)
 const calendarId = Config.calendarId["primary"] 
 
 /**
@@ -25,22 +32,103 @@ const calendarId = Config.calendarId["primary"]
  */
 const Semaine = require('./classes/semaine.js')
 
+let semaines
+
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
 const resetNode = "\x1b[0m"
 
-let semaines = new Array()
 bot.on("ready", () => {
     console.log(`Logged in as ${bot.user.tag}!`)
+    extractDatas()
+})
 
-    const options = {}
+async function deleteGoogleCalendar(){
+    let semaine = semaines[0]
+    let numeroJour = semaine.getNumeroPremierJourSemaine()
+    numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
+    let params = {
+        timeMin: `2020-${semaine.getNumeroMois()}-${numeroJour}T00:00:00+02:00`,
+        maxResults: 1000
+    }
     
-    pdfExtract.extract("EDT.pdf", options, (err, data) => {
+	await cal.Events.list(calendarId, params).then(json => {
+        json.forEach(async function(json){
+            if(!json.summary.startsWith("Rendre ")){
+                await cal.Events.delete(calendarId, json.id, {})
+            }
+        })
+    }).catch(err => {
+        console.log(redNode, "/!\\ WARNING - Delete Evenement", resetNode)
+        console.log(err)
+    })
+}
+async function insertGoogleCalendar(){
+    let semaine = semaines[0]
+    let cptJour = 0
+    await semaine.getJours().forEach(function(jour){
+        jour.getCours().forEach(async function(cours){
+            if(!cours.isCoursIng()){
+                let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
+                numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
+
+                let event = {
+                    "summary": cours.getTitre(),
+                    "description": cours.getProf(),
+                    "location": cours.getLieu(),
+                    "start": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureDebut()}:00+02:00`},
+                    "end": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureFin()}:00+02:00`}
+                }
+                await cal.Events.insert(calendarId, event).catch(err => {
+                    console.log(redNode, "/!\\ WARNING - Insertion Evenement", resetNode)
+                })
+            }
+        })
+        cptJour++
+    })
+}
+
+async function updateGoogleCalendar(){
+    try{
+        await deleteGoogleCalendar()
+        console.log(blueNode, "Events Deleted", resetNode)
+        await insertGoogleCalendar()
+        console.log(blueNode, "Events Updated", resetNode)
+    }catch(err){
+        console.log(err)
+    }
+}
+
+bot.on("message", msg => {
+    if (msg.content === "ping") {
+        msg.reply("Pong!")
+        /*semaines.forEach(function(semaine){
+            semaine.print()
+        })*/
+        updateGoogleCalendar()
+    }
+})
+
+///////////////////////////////
+//// EXTRACTION DE DONNEES ////
+///////////////////////////////
+async function downloadPDF(pdfURL, outputFilename) {
+    let pdfBuffer = await request.get({uri: pdfURL, encoding: null})
+    fs.writeFileSync(outputFilename, pdfBuffer)
+}
+
+async function downloadAndCollectDatas(){
+    semaines = new Array()
+
+    await downloadPDF(urlPdf, "EDT.pdf")
+    console.log(blueNode, "PDF Downloaded", resetNode)
+
+    pdfExtract.extract("EDT.pdf", {}, (err, data) => {
         if (err) return console.log(err)
+        //console.log(data.meta.info.CreationDate, "\n")
+
         data.pages[0].content.forEach(function(element){
             if(element.x < 65){ //Titre d'une semaine
-                console.log(blueNode, "[|] Ajoute semaine " + element.str, resetNode)
-
                 //On initialise notre semaine
                 const regex = RegExp("U[1-4]/*")
                 let debutLigne = 0
@@ -71,7 +159,6 @@ bot.on("ready", () => {
                                 }else{
                                     console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
                                     console.log(elem)
-                                    console.log()
                                 }
 
                             }else{ //Création du cours
@@ -91,7 +178,6 @@ bot.on("ready", () => {
                             }else{
                                 console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
                                 console.log(elem)
-                                console.log()
                             }
                         }
                     }
@@ -101,41 +187,15 @@ bot.on("ready", () => {
             }
            
         })
-    })  
+    })
+}
 
-})
-    
-bot.on("message", msg => {
-    if (msg.content === "ping") {
-        msg.reply("Pong!")
-        /*semaines.forEach(function(semaine){
-            semaine.print()
-        })*/
-        let semaine = semaines[0]
-        let cptJour = 0
-        semaine.getJours().forEach(function(jour){
-            jour.getCours().forEach(function(cours){
-                if(!cours.isCoursIng()){
-                    let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
-                    numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
-    
-                    let event = {
-                        "summary": cours.getTitre(),
-                        "description": cours.getProf(),
-                        "location": cours.getLieu(),
-                        "start": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureDebut()}:00+02:00`},
-                        "end": {"dateTime": `2020-${semaine.getNumeroMois()}-${numeroJour}T${cours.getHeureFin()}:00+02:00`}
-                    }
-                    cal.Events.insert(calendarId, event).then(() => {
-                        console.log("Insert ", cours.getTitre());
-                    }).catch(err => {
-                        console.log(redNode, "/!\\ WARNING - Insertion Evenement", resetNode);
-                    })
-                }
-            })
-            cptJour++
-        })
-    }
-})
+async function extractDatas(){
+    await downloadAndCollectDatas()
+    console.log(blueNode, "Datas Extracted", resetNode)
+}
 
+//////////////////////
+//// LOGIN DU BOT ////
+//////////////////////
 bot.login(process.env.BOT_TOKEN)
