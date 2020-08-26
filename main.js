@@ -43,12 +43,6 @@ bot.on("ready", () => {
     extractDatas()
 })
 
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-}   
-
 async function deleteGoogleCalendar(){
     let semaine = semaines[0]
     let numeroJour = semaine.getNumeroPremierJourSemaine()
