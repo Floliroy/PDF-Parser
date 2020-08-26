@@ -63,6 +63,7 @@ async function deleteGoogleCalendar(){
     let params = {
         timeMin: `2020-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+02:00`,
         showDeleted: false,
+        singleEvents: true,
         maxResults: 2500
     }
     
@@ -126,9 +127,9 @@ async function insertGoogleCalendar(){
 
 async function updateGoogleCalendar(){
     try{
-        //await deleteGoogleCalendar()
+        await deleteGoogleCalendar()
         console.log(blueNode, "Events Deleted", resetNode)
-        await insertGoogleCalendar()
+        //await insertGoogleCalendar()
         console.log(blueNode, "Events Updated", resetNode)
     }catch(err){
         console.log(err)
