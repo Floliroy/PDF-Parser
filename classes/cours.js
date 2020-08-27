@@ -43,7 +43,8 @@ function secondesToHeure(secondes, addHour){
  */
 function getSecondesByCoord(coordX){
     //On gère nos exceptions 
-    if(coordX > 367-3 && coordX < 367+3){return 43200}
+    if(coordX > 221-3 && coordX < 221+3){return 35100}
+    if(coordX > 359-3 && coordX < 367+3){return 43200}
     if(coordX > 422-3 && coordX < 422+3){return 48600}
     if(coordX > 439-3 && coordX < 439+3){return 49500}
     if(coordX > 597-3 && coordX < 597+3){return 57600}
@@ -141,7 +142,7 @@ module.exports = class Cours{
      * Affiche les infos utiles du cours
      */
     print(){
-        console.log(`       [${this.getHeureDebut()}${this.getEndOfCase() ? " - " + this.getHeureFin() : ""}]`
+        console.log(`       [${this.getHeureDebut()}:${this.getHeureFin()} - ${this.#coordX}:${this.getEndOfCase()?this.#endOfCase:"???"}]`
                             + `${this.#coursAlt ? " - Alternant" : ""}${this.#coursIng ? " - Ingénieur" : ""}`)
         console.log(`       ${this.#titre}${this.#lieu ? " - " + this.#lieu : ""}${this.#prof ? " (" + this.#prof + ")" : ""}`)
     }

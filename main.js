@@ -55,8 +55,6 @@ bot.on("ready", () => {
     extractDatas()
 })
 
-
-
 async function deleteGoogleCalendar(){
     let numeroJour = semaines[0].getNumeroPremierJourSemaine()
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
@@ -67,38 +65,28 @@ async function deleteGoogleCalendar(){
         maxResults: 2500
     }
     
-	return await cal.Events.list(calendarId, params).then(json => {
-        console.log(json.length)
-        json.forEach(async function(json){
+	await cal.Events.list(calendarId, params).then(async function(jsons){
+        //console.log(jsons.length)
+        for(const json of jsons){
             if(json.description == "#Generated"){
-                let redo = false
-                do{
-                    await cal.Events.delete(calendarId, json.id, {})
-                        .then(resp => console.log("Delete Ok"))
-                        .catch(err => {
-                            let jsonErr = JSON.parse(err.message)
-                            redo = false
-                            if(jsonErr.error.statusCode == "403(Forbidden)"){
-                                redo = true
-                            }else{
-                                console.log("Delete Not Ok")
-                                //console.log(jsonErr)
-                            }
-                        })
-                }while(redo)
+                await cal.Events.delete(calendarId, json.id, {})
+                    .catch(err => console.log(JSON.parse(err.message)))
             }
-        })
+        }
     }).catch(err => {
         console.log(redNode, "/!\\ WARNING - Delete Evenement", resetNode)
         console.log(err)
     })
 }
 async function insertGoogleCalendar(){
-    semaines.forEach(async function(semaine){
+    for(const semaine of semaines){
         let cptJour = 0
-        return await semaine.getJours().forEach(function(jour){
-            jour.getCours().forEach(async function(cours){
-                if(!cours.isCoursIng()){
+        
+        const jours = await semaine.getJours()
+        for(const jour of jours){
+            const cours = await jour.getCours()
+            for(const cour of cours){
+                if(!cour.isCoursIng()){
                     let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
 
                     let date = new Date(2020, semaine.getNumeroMois()-1, numeroJour)
@@ -108,29 +96,32 @@ async function insertGoogleCalendar(){
                     let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
 
                     let event = {
-                        "summary": `${cours.getTitre()}${cours.getProf() ? " - " + cours.getProf() : ""}`,
+                        "summary": `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`,
                         "description": "#Generated",
-                        "location": cours.getLieu(),
-                        "start": {"dateTime": `2020-${month}-${day}T${cours.getHeureDebut()}:00+02:00`},
-                        "end": {"dateTime": `2020-${month}-${day}T${cours.getHeureFin()}:00+02:00`}
+                        "location": cour.getLieu(),
+                        "start": {"dateTime": `2020-${month}-${day}T${cour.getHeureDebut()}:00+02:00`},
+                        "end": {"dateTime": `2020-${month}-${day}T${cour.getHeureFin()}:00+02:00`}
                     }
 
                     await cal.Events.insert(calendarId, event)
-                        .then(resp => console.log("Insert Ok"))
                         .catch(err => console.log(event, JSON.parse(err.message)))
                 }
-            })
+            }
             cptJour++
-        })
-    })
+        }
+    }
 }
 
 async function updateGoogleCalendar(){
     try{
+        console.log(blueNode, "Start Update Calendar", resetNode)
         await deleteGoogleCalendar()
         console.log(blueNode, "Events Deleted", resetNode)
-        //await insertGoogleCalendar()
+        await insertGoogleCalendar()
         console.log(blueNode, "Events Updated", resetNode)
+        for(const semaine of semaines){
+            semaine.print()
+        }
     }catch(err){
         console.log(err)
     }
@@ -185,7 +176,8 @@ async function downloadAndCollectDatas(){
                                     let coursModif = semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
                                     if(!coursModif.getLieu()){
                                         coursModif.setLieu(elem.str)
-                                        coursModif.setEndOfCase(elem.width > 14 ? (elem.x + elem.width) : (elem.x + elem.width/2 + 19))
+                                        //coursModif.setEndOfCase(elem.width > 14 ? (elem.x + elem.width) : (elem.x + elem.width/2 + 19))
+                                        coursModif.setEndOfCase(elem.x + elem.width)
     
                                         if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
                                             if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){

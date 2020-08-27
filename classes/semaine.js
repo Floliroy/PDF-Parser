@@ -30,7 +30,7 @@ module.exports = class Semaine{
      * Getter sur la liste des jours
      */
     getJours(){
-        return this.#jours
+        return new Promise((resolve) => resolve(this.#jours))
     }
     /**
      * Récupère le numéro du mois actuel

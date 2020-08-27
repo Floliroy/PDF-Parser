@@ -111,6 +111,6 @@ module.exports = class Jour{
         return this.#coordY + 18
     }
     getCours(){
-        return this.#cours
+        return new Promise((resolve) => resolve(this.#cours))
     }
 }
