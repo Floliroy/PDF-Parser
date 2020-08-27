@@ -66,11 +66,18 @@ async function deleteGoogleCalendar(){
     }
     
 	await cal.Events.list(calendarId, params).then(async function(jsons){
-        //console.log(jsons.length)
+
         for(const json of jsons){
             if(json.description == "#Generated"){
-                await cal.Events.delete(calendarId, json.id, {})
-                    .catch(err => console.log(JSON.parse(err.message)))
+                let redo
+                do{
+                    redo = false
+                    await cal.Events.delete(calendarId, json.id, {})
+                    .catch(err => {
+                        redo = true
+                        console.log(JSON.parse(err.message))
+                    })
+                }while(redo)
             }
         }
     }).catch(err => {
@@ -103,8 +110,15 @@ async function insertGoogleCalendar(){
                         "end": {"dateTime": `2020-${month}-${day}T${cour.getHeureFin()}:00+02:00`}
                     }
 
-                    await cal.Events.insert(calendarId, event)
-                        .catch(err => console.log(event, JSON.parse(err.message)))
+                    let redo
+                    do{
+                        redo = false
+                        await cal.Events.insert(calendarId, event)
+                        .catch(err => {
+                            redo = true
+                            console.log(event, JSON.parse(err.message))
+                        })
+                    }while(redo)
                 }
             }
             cptJour++
@@ -119,9 +133,6 @@ async function updateGoogleCalendar(){
         console.log(blueNode, "Events Deleted", resetNode)
         await insertGoogleCalendar()
         console.log(blueNode, "Events Updated", resetNode)
-        for(const semaine of semaines){
-            semaine.print()
-        }
     }catch(err){
         console.log(err)
     }
@@ -130,10 +141,10 @@ async function updateGoogleCalendar(){
 bot.on("message", msg => {
     if (msg.content === "ping") {
         msg.reply("Pong!")
-        /*semaines.forEach(function(semaine){
-            semaine.print()
-        })*/
         updateGoogleCalendar()
+        /*for(const semaine of semaines){
+            semaine.print()
+        }*/
     }
 })
 
@@ -155,13 +166,13 @@ async function downloadAndCollectDatas(){
         if (err) return console.log(err)
         //console.log(data.meta.info.CreationDate, "\n")
 
-        data.pages[0].content.forEach(function(element){
+        for(const element of data.pages[0].content){
             if(element.x < 65){ //Titre d'une semaine
                 //On initialise notre semaine
                 const regex = RegExp("U[1-4]/*")
                 let debutLigne = 0
                 let semaine = new Semaine(element.str)
-                data.pages[0].content.forEach(function(elem){
+                for(const elem of data.pages[0].content){
                     //On reboucle pour chercher les infos utiles a notre semaine
                     if(elem.y >= element.y-1 && elem.y <= element.y+85){
                         if(elem.x > 104 && elem.fontName == "g_d0_f6"){ //Cours ou Lieu dans le tableau
@@ -174,18 +185,26 @@ async function downloadAndCollectDatas(){
                             if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
                                 if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)){
                                     let coursModif = semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
-                                    if(!coursModif.getLieu()){
+                                    if(coursModif.getLieu() == ""){
                                         coursModif.setLieu(elem.str)
-                                        //coursModif.setEndOfCase(elem.width > 14 ? (elem.x + elem.width) : (elem.x + elem.width/2 + 19))
                                         coursModif.setEndOfCase(elem.x + elem.width)
     
                                         if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
                                             if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
                                                 coursModif.setCoursIng(true)
+                                                if(semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)){
+                                                    semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif).setCoursAlt(true)
+                                                }
                                             }else{
                                                 coursModif.setCoursAlt(true)
+                                                if(semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)){
+                                                    semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif).setCoursIng(true)
+                                                }
                                             }
                                         }
+                                    }else{
+                                        console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
+                                        console.log(elem)
                                     }
                                 }else{
                                     console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
@@ -193,7 +212,7 @@ async function downloadAndCollectDatas(){
                                 }
 
                             }else{ //Création du cours
-                                if(semaine.getDernierJour().getDernierCours()){
+                                if(semaine.getDernierJour().getDernierCours() && semaine.getDernierJour().getDernierCours().getNextCoordX() == 1000000){
                                     semaine.getDernierJour().getDernierCours().setNextCoordX(elem.x)
                                 }
                                 semaine.getDernierJour().addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
@@ -212,12 +231,12 @@ async function downloadAndCollectDatas(){
                             }
                         }
                     }
-                })
+                }
                 //On ajoute la semaine a notre liste de semaines
                 semaines.push(semaine)
             }
            
-        })
+        }
     })
 }
 

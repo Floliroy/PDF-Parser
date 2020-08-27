@@ -22,10 +22,11 @@ function getClosest(min){
  * @param {*} secondes Le temps en seconde à transformer
  */
 function secondesToHeure(secondes, addHour){
-    let hour  = Math.floor(secondes / 3600) + addHour
+    let hour  = Math.floor(secondes / 3600)
     let min = Math.floor((secondes - (hour * 3600)) / 60)
     
     min = getClosest(min)
+    hour += addHour
     //Si on a 60 c'est qu'on a une heure de plus
     if(min == 60){
         hour++
@@ -96,7 +97,7 @@ module.exports = class Cours{
      * @param {*} width Largeur
      * @param {*} height Hauteur
      */
-    constructor(titre, coordX, coordY, width, height){
+    constructor(titre, coordX, coordY, width, height, jour){
         const regexTrois = RegExp("/* - [A-Z][A-Z][A-Z]")
         const regexDeux  = RegExp("/* - [A-Z][A-Z]")
         if(regexTrois.test(titre)){ //Prof avec trois lettres
@@ -111,9 +112,11 @@ module.exports = class Cours{
             this.#titre = titre.trim()
         }
 
-        /*if(titre == "Sport"){
-            this.#coursIng = true
-        }*/
+        if(jour && jour.getCoursFirstCoordX(coordX)){
+            this.#nextCoordX = jour.getCoursFirstCoordX(coordX)
+        }else{
+            this.#nextCoordX = 1000000
+        }
 
         this.#coordX = coordX
         this.#coordY = coordY

@@ -39,7 +39,7 @@ module.exports = class Jour{
      * @param {*} height Hauteur
      */
     addCours(titre, coordX, coordY, width, height){
-        this.#cours.push(new Cours(titre, coordX, coordY, width, height))
+        this.#cours.push(new Cours(titre, coordX, coordY, width, height, this))
     }
 
     /**
@@ -58,18 +58,56 @@ module.exports = class Jour{
         })
     }
     /**
+     * Récupère l'autre cours ayant la même coordonnée de début en X
+     * @param {*} cours Le cours ayant la même coordonnée en X
+     */
+    getOtherCoursParDebut(cours){
+        return this.#cours.find(element => {
+            return element.getStartCoordX() == cours.getStartCoordX() && element != cours
+        })
+    }
+    /**
+     * Récupère le cours ayant la première coordonné supérieur a celle passé en parametre
+     * @param {*} coordX La coordonnée à rechercher
+     */
+    getCoursFirstCoordX(coordX){
+        let difference = 1000000
+        let retour = null
+        this.#cours.forEach(function(cours){
+            if(cours.getStartCoordX() - coordX < difference && cours.getStartCoordX() - coordX > 120){
+                difference = cours.getStartCoordX() - coordX
+                retour = cours.getStartCoordX()
+            }
+        })
+        return retour
+    }
+    /**
      * Récupère le cours qui contient certains coordonnées en X et Y
      * @param {*} coordX La coordonnée en X à rechercher
      * @param {*} coordY La coordonnée en Y à rechercher
      */
     getCoursEntreCoord(coordX, coordY){
-        return this.#cours.find(element => {
+        let coursPossible = new Array()
+        for(let cour of this.#cours){
             if(this.isDoubleCours(coordX)){
-                return element.getStartCoordX() <= coordX && element.getNextCoordX() > coordX && (element.getStartCoordY()-1 < coordY && element.getStartCoordY()+1 > coordY)
+                if(cour.getStartCoordX() <= coordX && cour.getNextCoordX() > coordX && (cour.getStartCoordY()-1 < coordY && cour.getStartCoordY()+1 > coordY)){
+                    coursPossible.push(cour)
+                }
             }else{
-                return element.getStartCoordX() <= coordX && element.getNextCoordX() > coordX
+                if(cour.getStartCoordX() <= coordX && cour.getNextCoordX() > coordX){
+                    coursPossible.push(cour)
+                }
             }
-        })
+        }
+        let minCoordX = 1000000
+        let retour = coursPossible[coursPossible.length-1]
+        for(let cour of coursPossible){
+            if(cour.getStartCoordX() < minCoordX && cour.getStartCoordX() > coordX){
+                minCoordX = cour.getStartCoordX()
+                retour = cour
+            }
+        }
+        return retour
     }
     /**
      * Vérifie si pour une coordonnée on a deux cours possible en même teps
