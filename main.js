@@ -23,8 +23,7 @@ bot.on("ready", async () => {
     semaines = retour.semaines
     update = retour.update
 
-    semaines[0].print()
-    console.log("Update", update)
+    console.log("Update needed:", update)
 })
 
 bot.on("message", msg => {

@@ -4,6 +4,8 @@
 const PDFExtract = require('pdf.js-extract').PDFExtract
 const pdfExtract = new PDFExtract()
 
+const pdfParser = require('pdf-parse');
+
 /**
  * Request globals
  */
@@ -38,7 +40,7 @@ module.exports = class ExtractDatasPDF{
             await extractDatas(semaines)
             console.log(blueNode, "Datas Extracted", resetNode)
     
-            console.log(prevVersion, lastVersion)
+            //console.log(prevVersion, lastVersion)
             return {semaines: semaines, update: prevVersion != lastVersion}
         }catch(err){
             console.log(err)
@@ -48,12 +50,9 @@ module.exports = class ExtractDatasPDF{
 }
 
 async function getVersion(){
-    try{
-        const data = await pdfExtract.extract("EDT.pdf", {})
-        return data.meta.info.CreationDate
-    }catch (err){
-        console.log(err)
-    }
+    return pdfParser(await fs.readFileSync("EDT.pdf")).then(function(data) {
+        return data.info.CreationDate
+    })
 }
 
 async function downloadPDF(pdfURL, outputFilename) {
