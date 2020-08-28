@@ -159,22 +159,22 @@ async function downloadPDF(pdfURL, outputFilename) {
 async function downloadAndCollectDatas(){
     semaines = new Array()
 
-    let lastCreationPDF
+    /*let lastCreationPDF
     pdfExtract.extract("EDT.pdf", {}, (err, data) => {
         if (err) return console.log(err)
         lastCreationPDF = data.meta.info.CreationDate
-    })
+    })*/
 
     await downloadPDF(urlPdf, "EDT.pdf")
     console.log(blueNode, "PDF Downloaded", resetNode)
 
     pdfExtract.extract("EDT.pdf", {}, (err, data) => {
         if (err) return console.log(err)
-        if(lastCreationPDF != data.meta.info.CreationDate){
+        /*if(lastCreationPDF != data.meta.info.CreationDate){
             console.log(blueNode, "Need to Reload Datas", resetNode)
         }else{
             console.log(blueNode, "Datas Up to Date", resetNode)
-        }
+        }*/
 
         for(const element of data.pages[0].content){
             if(element.x < 65){ //Titre d'une semaine
