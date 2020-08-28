@@ -23,33 +23,37 @@ const resetNode = "\x1b[0m"
 module.exports = class ExtractDatasPDF{
 
     static async extract(){
-        let semaines = new Array()
+        try{
+            let semaines = new Array()
 
-        //On récupère la version du pdf actuel
-        //const prevVersion = await getVersion()
-
-        await downloadPDF(urlPdf, "EDT.pdf")
-        console.log(blueNode, "PDF Downloaded", resetNode)
-        
-        //On récupère la nouvelle version du pdf
-        //const lastVersion = await getVersion()
-
-        await extractDatas(semaines)
-        console.log(blueNode, "Datas Extracted", resetNode)
-
-        return semaines
+            //On récupère la version du pdf actuel
+            const prevVersion = await getVersion()
+    
+            await downloadPDF(urlPdf, "EDT.pdf")
+            console.log(blueNode, "PDF Downloaded", resetNode)
+            
+            //On récupère la nouvelle version du pdf
+            const lastVersion = await getVersion()
+    
+            await extractDatas(semaines)
+            console.log(blueNode, "Datas Extracted", resetNode)
+    
+            console.log(prevVersion, lastVersion)
+            return {semaines: semaines, update: prevVersion != lastVersion}
+        }catch(err){
+            console.log(err)
+        }
     }
 
 }
 
 async function getVersion(){
-    let data
     try{
-        data = await pdfExtract.extract("EDT.pdf", {})
+        const data = await pdfExtract.extract("EDT.pdf", {})
+        return data.meta.info.CreationDate
     }catch (err){
         console.log(err)
     }
-    return data.meta.info.CreationDate
 }
 
 async function downloadPDF(pdfURL, outputFilename) {
@@ -58,82 +62,85 @@ async function downloadPDF(pdfURL, outputFilename) {
 }
 
 async function extractDatas(semaines){
-    let data
     try{
-        data = await pdfExtract.extract("EDT.pdf", {})
-    }catch (err){
-        console.log(err)
-    }
+        const data = await pdfExtract.extract("EDT.pdf", {})
 
-    for await(const element of data.pages[0].content){
-        if(element.x < 65){ //Titre d'une semaine
-            //On initialise notre semaine
-            const regex = RegExp("U[1-4]/*")
-            let debutLigne = 0
-            let semaine = new Semaine(element.str)
+        for await(const element of data.pages[0].content){
+            if(element.x < 65){ //Titre d'une semaine
+                //On initialise notre semaine
+                const regex = RegExp("U[1-4]/*")
+                let debutLigne = 0
+                let semaine = new Semaine(element.str)
+    
+                for await(const elem of data.pages[0].content){
+                    //On reboucle pour chercher les infos utiles a notre semaine
+                    if(elem.y >= element.y-1 && elem.y <= element.y+85){
+                        if(elem.x > 104 && elem.fontName == "g_d0_f6"){ //Cours ou Lieu dans le tableau
+    
+                            if(elem.y - debutLigne >= 18){ //On est passé a une nouvelle ligne
+                                semaine.addJour(elem.y)
+                                debutLigne = elem.y
+                            }
+    
+                            if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
+                                if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)){
+                                    
+                                    let coursModif = semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
+                                    if(coursModif.getLieu() == ""){
+                                        coursModif.setLieu(elem.str)
+                                        coursModif.setEndOfCase(elem.x + elem.width)
+    
+                                        if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
 
-            for await(const elem of data.pages[0].content){
-                //On reboucle pour chercher les infos utiles a notre semaine
-                if(elem.y >= element.y-1 && elem.y <= element.y+85){
-                    if(elem.x > 104 && elem.fontName == "g_d0_f6"){ //Cours ou Lieu dans le tableau
-
-                        if(elem.y - debutLigne >= 18){ //On est passé a une nouvelle ligne
-                            semaine.addJour(elem.y)
-                            debutLigne = elem.y
-                        }
-
-                        if(regex.test(elem.str.slice(0,2)) || elem.str == "Amphi"){ //Ajout du lieu
-                            if(semaine.getJourEntreCoord(elem.y) && semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)){
-                                let coursModif = semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
-                                if(coursModif.getLieu() == ""){
-                                    coursModif.setLieu(elem.str)
-                                    coursModif.setEndOfCase(elem.x + elem.width)
-
-                                    if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
-                                        if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
-                                            coursModif.setCoursIng(true)
-                                            if(semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)){
-                                                semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif).setCoursAlt(true)
-                                            }
-                                        }else{
-                                            coursModif.setCoursAlt(true)
-                                            if(semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)){
-                                                semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif).setCoursIng(true)
+                                            let otherCours = semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)
+                                            if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
+                                                coursModif.setCoursIng(true)
+                                                if(otherCours){
+                                                    otherCours.setCoursAlt(true)
+                                                }
+                                            }else{
+                                                coursModif.setCoursAlt(true)
+                                                if(otherCours){
+                                                    otherCours.setCoursIng(true)
+                                                }
                                             }
                                         }
+                                    }else{
+                                        console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
+                                        console.log(elem)
                                     }
                                 }else{
                                     console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
                                     console.log(elem)
                                 }
+    
+                            }else{ //Création du cours
+                                let dernierJour = semaine.getDernierJour()
+                                if(dernierJour.getDernierCours() && dernierJour.getDernierCours().getNextCoordX() == 1000000){
+                                    dernierJour.getDernierCours().setNextCoordX(elem.x)
+                                }
+                                dernierJour.addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
+                            }
+                        }
+    
+                        if(elem.x > 104 && elem.fontName == "g_d0_f7"){ //Prof dans le tableau
+                            if(semaine.getDernierJour() && semaine.getDernierJour().getCoursParDebut(elem.x)){
+                                let coursModif = semaine.getDernierJour().getCoursParDebut(elem.x)
+                                coursModif.setProf(elem.str)
+                                coursModif.setCoursIng(false)
+                                coursModif.setCoursAlt(false)
                             }else{
-                                console.log(redNode, "/!\\ WARNING - Lieu : " + elem.str, resetNode)
+                                console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
                                 console.log(elem)
                             }
-
-                        }else{ //Création du cours
-                            if(semaine.getDernierJour().getDernierCours() && semaine.getDernierJour().getDernierCours().getNextCoordX() == 1000000){
-                                semaine.getDernierJour().getDernierCours().setNextCoordX(elem.x)
-                            }
-                            semaine.getDernierJour().addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
-                        }
-                    }
-
-                    if(elem.x > 104 && elem.fontName == "g_d0_f7"){ //Prof dans le tableau
-                        if(semaine.getDernierJour() && semaine.getDernierJour().getCoursParDebut(elem.x)){
-                            let coursModif = semaine.getDernierJour().getCoursParDebut(elem.x)
-                            coursModif.setProf(elem.str)
-                            coursModif.setCoursIng(false)
-                            coursModif.setCoursAlt(false)
-                        }else{
-                            console.log(redNode, "/!\\ WARNING - Prof : " + elem.str, resetNode)
-                            console.log(elem)
                         }
                     }
                 }
+                //On ajoute la semaine a notre liste de semaines
+                await semaines.push(semaine)
             }
-            //On ajoute la semaine a notre liste de semaines
-            await semaines.push(semaine)
         }
+    }catch (err){
+        console.log(err)
     }
 }

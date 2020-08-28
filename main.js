@@ -18,16 +18,19 @@ let semaines
  */
 bot.on("ready", async () => {
     console.log(`Logged in as ${bot.user.tag}!`)
-    semaines = await ExtractDatasPDF.extract()
+
+    retour = await ExtractDatasPDF.extract()
+    semaines = retour.semaines
+    update = retour.update
+
+    semaines[0].print()
+    console.log("Update", update)
 })
 
 bot.on("message", msg => {
     if (msg.content === "ping") {
         msg.reply("Pong!")
         ImportDatasCalendar.import(semaines)
-        /*for(const semaine of semaines){
-            semaine.print()
-        }*/
     }
 })
 
