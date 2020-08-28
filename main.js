@@ -23,12 +23,16 @@ bot.on("ready", async () => {
     semaines = retour.semaines
     update = retour.update
 
-    console.log("Update needed:", update)
+    console.log(" Update needed:", update)
+    if(update){
+        ImportDatasCalendar.import(semaines)
+    }
 })
 
 bot.on("message", msg => {
     if (msg.content === "ping") {
         msg.reply("Pong!")
+    }else if(msg.content === "!import"){
         ImportDatasCalendar.import(semaines)
     }
 })
