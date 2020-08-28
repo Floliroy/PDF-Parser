@@ -86,4 +86,28 @@ module.exports = class Semaine{
             jour.print()
         })
     }
+
+    async removeCours(nomCours, dateDebut){
+        let cptJour = 0
+        const jours = await this.getJours()
+        for(const jour of jours){
+            const cours = await jour.getCours()
+            for(const cour of cours){
+                if(!cour.isCoursIng()){
+                    let numeroJour = this.getNumeroPremierJourSemaine() + cptJour
+
+                    let date = new Date(2020, this.getNumeroMois()-1, numeroJour)
+                    date.addDays(cptJour)
+
+                    let month = date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1
+                    let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
+                    
+                    if(dateDebut == `2020-${month}-${day}T${cour.getHeureDebut()}:00+02:00` && nomCours.includes(cour.getTitre())){
+                        cours.splice(cours.indexOf(cour), 1)
+                    }
+                }
+            }
+            cptJour++
+        }
+    }
 }

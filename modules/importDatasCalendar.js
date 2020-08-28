@@ -64,6 +64,10 @@ async function deleteGoogleCalendar(semaines){
                         console.log(JSON.parse(err.message))
                     })
                 }while(redo)
+            }else if(json.description.startsWith("#NoDelete")){
+                for(const semaine of semaines){
+                    cours = await semaine.removeCours(json.summary, json.start.dateTime)
+                }
             }
         }
     }).catch(err => {
