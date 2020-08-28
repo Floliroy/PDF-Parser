@@ -18,7 +18,7 @@ let semaines
  */
 bot.on("ready", async () => {
     console.log(`Logged in as ${bot.user.tag}!`)
-    semaines = await ExtractDatasPDF.extract()
+    semaines, update = await ExtractDatasPDF.extract()
 })
 
 bot.on("message", msg => {

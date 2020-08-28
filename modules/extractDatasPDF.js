@@ -25,15 +25,31 @@ module.exports = class ExtractDatasPDF{
     static async extract(){
         let semaines = new Array()
 
+        //On récupère la version du pdf actuel
+        const prevVersion = await getVersion()
+
         await downloadPDF(urlPdf, "EDT.pdf")
         console.log(blueNode, "PDF Downloaded", resetNode)
+        
+        //On récupère la nouvelle version du pdf
+        const lastVersion = await getVersion()
 
         await extractDatas(semaines)
         console.log(blueNode, "Datas Extracted", resetNode)
 
-        return semaines
+        return semaines, (prevVersion == lastVersion)
     }
 
+}
+
+async function getVersion(){
+    let data
+    try{
+        data = await pdfExtract.extract("EDT.pdf", {})
+    }catch (err){
+        console.log(err)
+    }
+    return data.meta.info.CreationDate
 }
 
 async function downloadPDF(pdfURL, outputFilename) {
