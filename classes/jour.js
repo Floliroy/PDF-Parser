@@ -2,6 +2,7 @@ const Cours = require('./cours.js')
 
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
+const oranNode = "\x1b[33m"
 const resetNode = "\x1b[0m"
 
 const listeJours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"]

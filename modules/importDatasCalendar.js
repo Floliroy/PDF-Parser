@@ -11,6 +11,7 @@ const calendarId = Config.calendarId["primary"]
  */
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
+const oranNode = "\x1b[33m"
 const resetNode = "\x1b[0m"
 
 module.exports = class ImportDatasCalendar{
@@ -40,12 +41,19 @@ Date.prototype.addDays = function(days) {
     return date;
 }
 
-
 async function deleteGoogleCalendar(semaines){
+    let dateAjd = new Date()
+    let annee = dateAjd.getFullYear()
+    if(semaines[0].getNumeroMois()-1 > dateAjd.getMonth() && semaines[0].getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
+        annee -= 1
+    }
+    let dateDebut = new Date(annee, semaines[0].getNumeroMois()-1, semaines[0].getNumeroPremierJourSemaine())
+
     let numeroJour = semaines[0].getNumeroPremierJourSemaine()
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
+
     let params = {
-        timeMin: `2020-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+02:00`,
+        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+0${dateDebut.getTimezoneOffset()/-60}:00`,
         showDeleted: false,
         singleEvents: true,
         maxResults: 2500
@@ -76,6 +84,9 @@ async function deleteGoogleCalendar(semaines){
     })
 }
 async function insertGoogleCalendar(semaines){
+    let dateAjd = new Date()
+    let annee = dateAjd.getFullYear()
+
     for(const semaine of semaines){
         let cptJour = 0
         
@@ -83,10 +94,14 @@ async function insertGoogleCalendar(semaines){
         for(const jour of jours){
             const cours = await jour.getCours()
             for(const cour of cours){
+                
                 if(!cour.isCoursIng()){
                     let numeroJour = semaine.getNumeroPremierJourSemaine() + cptJour
 
-                    let date = new Date(2020, semaine.getNumeroMois()-1, numeroJour)
+                    if(semaine.getNumeroMois()-1 > dateAjd.getMonth() && semaine.getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
+                        annee -= 1
+                    }
+                    let date = new Date(annee, semaine.getNumeroMois()-1, numeroJour)
                     date.addDays(cptJour)
 
                     let month = date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1
@@ -96,8 +111,8 @@ async function insertGoogleCalendar(semaines){
                         "summary": `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`,
                         "description": "#Generated",
                         "location": cour.getLieu(),
-                        "start": {"dateTime": `2020-${month}-${day}T${cour.getHeureDebut()}:00+02:00`},
-                        "end": {"dateTime": `2020-${month}-${day}T${cour.getHeureFin()}:00+02:00`}
+                        "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${date.getTimezoneOffset()/-60}:00`},
+                        "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${date.getTimezoneOffset()/-60}:00`}
                     }
 
                     let redo

@@ -20,6 +20,7 @@ const Semaine = require('./../classes/semaine.js')
 
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
+const oranNode = "\x1b[33m"
 const resetNode = "\x1b[0m"
 
 module.exports = class ExtractDatasPDF{

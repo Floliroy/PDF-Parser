@@ -87,22 +87,34 @@ module.exports = class Semaine{
         })
     }
 
+    /**
+     * Supprime le cours ayant le meme titre et la meme date de début s'il exite
+     * @param {*} nomCours Titre du cours
+     * @param {*} dateDebut Date et heure de début du cours
+     */
     async removeCours(nomCours, dateDebut){
+        let dateAjd = new Date()
+        let annee = dateAjd.getFullYear()
+
         let cptJour = 0
         const jours = await this.getJours()
+
         for(const jour of jours){
             const cours = await jour.getCours()
             for(const cour of cours){
                 if(!cour.isCoursIng()){
                     let numeroJour = this.getNumeroPremierJourSemaine() + cptJour
 
-                    let date = new Date(2020, this.getNumeroMois()-1, numeroJour)
+                    if(this.getNumeroMois()-1 > dateAjd.getMonth() && this.getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
+                        annee -= 1
+                    }
+                    let date = new Date(annee, this.getNumeroMois()-1, numeroJour)
                     date.addDays(cptJour)
 
                     let month = date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1
                     let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
                     
-                    if(dateDebut == `2020-${month}-${day}T${cour.getHeureDebut()}:00+02:00` && nomCours.includes(cour.getTitre())){
+                    if(dateDebut == `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${date.getTimezoneOffset()/-60}:00` && nomCours.includes(cour.getTitre())){
                         cours.splice(cours.indexOf(cour), 1)
                     }
                 }
