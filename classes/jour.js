@@ -70,14 +70,20 @@ module.exports = class Jour{
     /**
      * Récupère le cours ayant la première coordonné supérieur a celle passé en parametre
      * @param {*} coordX La coordonnée à rechercher
+     * @param {*} coordY La coordonnée en Y du cours appelant
      */
-    getCoursFirstCoordX(coordX){
+    getCoursFirstCoordX(coordX, coordY){
         let difference = 1000000
         let retour = null
         this.#cours.forEach(function(cours){
             if(cours.getStartCoordX() - coordX < difference && cours.getStartCoordX() - coordX > 120){
-                difference = cours.getStartCoordX() - coordX
-                retour = cours.getStartCoordX()
+                if(!cours.isProfInName()){
+                    difference = cours.getStartCoordX() - coordX
+                    retour = cours.getStartCoordX()
+                }else if(cours.getStartCoordY()-1 < coordY && cours.getStartCoordY()+1 > coordY){
+                    difference = cours.getStartCoordX() - coordX
+                    retour = cours.getStartCoordX()
+                }
             }
         })
         return retour

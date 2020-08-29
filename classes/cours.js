@@ -27,6 +27,8 @@ module.exports = class Cours{
     #nextCoordX = 0
     /** CoordX de la fin de la case pour déterminer l'heure de fin */
     #endOfCase = 0
+    /** Indique si on a du remplir le prof par la suite ou non */
+    #profInName = false
 
     ///////////////////
     //// METHODES /////
@@ -46,17 +48,19 @@ module.exports = class Cours{
         if(regexTrois.test(titre)){ //Prof avec trois lettres
             this.#prof = titre.slice(-3).trim()
             this.#titre = titre.slice(0, -6).trim()
+            this.#profInName = true
         }else if(regexDeux.test(titre)){ //Prof avec deux lettres
             this.#prof = titre.slice(-2).trim()
             this.#titre = titre.slice(0, -5).trim()
+            this.#profInName = true
         }else if(titre.endsWith(" - ")){ //Fin inutile
             this.#titre = titre.slice(0, -3).trim()
         }else{
             this.#titre = titre.trim()
         }
 
-        if(jour && jour.getCoursFirstCoordX(coordX)){
-            this.#nextCoordX = jour.getCoursFirstCoordX(coordX)
+        if(jour && jour.getCoursFirstCoordX(coordX, coordY)){
+            this.#nextCoordX = jour.getCoursFirstCoordX(coordX, coordY)
         }else{
             this.#nextCoordX = 1000000
         }
@@ -131,6 +135,9 @@ module.exports = class Cours{
     }
     isCoursAlt(){
         return this.#coursAlt
+    }
+    isProfInName(){
+        return this.#profInName
     }
 
     getStartCoordX(){
