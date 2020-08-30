@@ -103,12 +103,10 @@ module.exports = class Semaine{
             const cours = await jour.getCours()
             for(const cour of cours){
                 if(!cour.isCoursIng()){
-                    let numeroJour = this.getNumeroPremierJourSemaine() + cptJour
-
                     if(this.getNumeroMois()-1 > dateAjd.getMonth() && this.getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
                         annee -= 1
                     }
-                    let date = new Date(annee, this.getNumeroMois()-1, numeroJour)
+                    let date = new Date(annee, this.getNumeroMois()-1, this.getNumeroPremierJourSemaine() + cptJour)
                     date.addDays(cptJour)
 
                     let month = date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1

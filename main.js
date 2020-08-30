@@ -62,6 +62,8 @@ bot.on("message", msg => {
         msg.channel.send(embed)
     }else if(msg.content.toLowerCase() === "!import"){
         importMessage(msg)
+    }else if(msg.content.toLowerCase() === "!daily"){
+        dailyMessage()
     }
 })
 
@@ -88,7 +90,6 @@ async function importMessage(msg){
         })
 
     messageEmbed.edit(embed)
-
 }
 
 /**
@@ -104,19 +105,70 @@ cron.schedule(`0 ${getHour(6)} * * *`, function() {
     console.log(oranNode, "Cron 06h00 Started", resetNode)
     extractAndImport(false)
 }, {timezone: "Europe/Paris"})
+/**
+ * Cron à 07h00
+ */
+cron.schedule(`0 ${getHour(7)} * * *`, function() {
+    console.log(oranNode, "Cron 07h00 Started", resetNode)
+    dailyMessage()
+}, {timezone: "Europe/Paris"})
+
+async function dailyMessage(){
+    const today = await getToday()
+    
+    if(today){
+        const cours = await today.getCours()
+
+        let channel = await bot.channels.fetch(channelsId.floTest)
+        const fetched = await channel.messages.fetch({limit: 100})
+        channel.bulkDelete(fetched).catch(err => {})
+
+        let embed = new Discord.MessageEmbed()
+            .setTitle(`Emploi du temps - ${today.getNom()}`)
+            .setThumbnail(urlLogoStri)
+        channel.send(embed)
+        for await(cour of cours){
+            if(!cour.isCoursIng()){
+                channel.send(cour.getEmbedMessage())
+            }
+        }
+    }else{
+        console.log(oranNode, "Not a School Day", resetNode)
+    }
+}
 
 ///////////////////
 //// FONCTIONS ////
 ///////////////////
 /**
- * Envoi un message privé sur discord
- * @param {*} member Le destinataire
- * @param {*} message Le message
+ * Récupère le jour d'aujourd'hui avec sa lite de cours
  */
-function sendPrivateMessage(member, message){
-    member.createDM().then((DMChannel) => {
-        DMChannel.send(message)
-    })
+async function getToday(){
+    let retour
+    if(!semaines){
+        extract = await ExtractDatasPDF.extract()
+        semaines = extract.semaines
+    }
+    const today = new Date()
+    let annee = today.getFullYear()
+    
+    for await(semaine of semaines){
+        let cptJour = 0
+        const jours = await semaine.getJours()
+        for await(jour of jours){
+            if(semaine.getNumeroMois()-1 > today.getMonth() && semaine.getNumeroMois()-1 > 7 && today.getMonth <= 7){
+                annee -= 1
+            }
+            let date = new Date(annee, semaine.getNumeroMois()-1, semaine.getNumeroPremierJourSemaine() + cptJour)
+            date.addDays(cptJour)
+            
+            if(date.getFullYear() == today.getFullYear() && date.getMonth() == today.getMonth() && date.getDate() == today.getDate()){
+                retour = jour
+            }
+            cptJour++
+        }
+    }
+    return retour
 }
 
 /**

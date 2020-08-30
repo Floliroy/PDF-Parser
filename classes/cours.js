@@ -1,4 +1,5 @@
 const ParseCoord = require('./../modules/parseCoord.js')
+const Discord = require('discord.js')
 
 module.exports = class Cours{
     /** Titre du cours */
@@ -69,6 +70,24 @@ module.exports = class Cours{
         this.#coordY = coordY
         this.#width  = width
         this.#height = height
+    }
+
+    /**
+     * Récupère le message embed associé au cours
+     */
+    getEmbedMessage(){
+        let messageEmbed = new Discord.MessageEmbed()
+            .setTitle(this.#titre)
+            .setDescription("=======================")
+            .addField("Début", `${this.getHeureDebut()}`, true)
+            .addField("Fin", `${this.getHeureFin()}`, true)
+        if(this.#prof){
+            messageEmbed.addField("Professeur", this.#prof)
+        }
+        if(this.#lieu){
+            messageEmbed.addField("Salle", this.#lieu)
+        }
+        return messageEmbed
     }
 
     /**
