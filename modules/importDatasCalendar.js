@@ -74,7 +74,7 @@ async function deleteGoogleCalendar(semaines){
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
 
     let params = {
-        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+0${dateDebut.getTimezoneOffset()/-60}:00`,
+        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+0${/*date.getTimezoneOffset()/-60*/0}:00`,
         showDeleted: false,
         singleEvents: true,
         maxResults: 2500
@@ -137,8 +137,8 @@ async function insertGoogleCalendar(semaines){
                             "summary": `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`,
                             "description": "#Generated",
                             "location": cour.getLieu(),
-                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${date.getTimezoneOffset()/-60}:00`},
-                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${date.getTimezoneOffset()/-60}:00`}
+                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${/*date.getTimezoneOffset()/-60*/0}:00`},
+                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${/*date.getTimezoneOffset()/-60*/0}:00`}
                         }
     
                         let redo
