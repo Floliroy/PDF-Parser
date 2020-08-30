@@ -70,7 +70,6 @@ async function deleteGoogleCalendar(semaines){
     if(semaines[0].getNumeroMois()-1 > dateAjd.getMonth() && semaines[0].getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
         annee -= 1
     }
-    let dateDebut = new Date(annee, semaines[0].getNumeroMois()-1, semaines[0].getNumeroPremierJourSemaine())
 
     let numeroJour = semaines[0].getNumeroPremierJourSemaine()
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
@@ -139,8 +138,8 @@ async function insertGoogleCalendar(semaines){
                             "summary": `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`,
                             "description": "#Generated",
                             "location": cour.getLieu(),
-                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${date.getTimezoneOffset()/-60}:00`},
-                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${date.getTimezoneOffset()/-60}:00`}
+                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${dateAjd.getTimezoneOffset()/-60}:00`},
+                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${dateAjd.getTimezoneOffset()/-60}:00`}
                         }
     
                         let redo
