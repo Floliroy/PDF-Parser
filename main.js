@@ -28,7 +28,8 @@ const urlLogoStri = "https://lh3.googleusercontent.com/proxy/VEi50kVBko8KmuuH6vL
 
 const channelsId = {
     floTest: "747366976434864188",
-    striBot: "693103241222684693"
+    striBot: "693103241222684693",
+    striEdt: "749446918823739392"
 }
 
 ///////////////////
@@ -120,7 +121,7 @@ async function dailyMessage(){
         await today.reorder()
         const cours = await today.getCours()
 
-        let channel = await bot.channels.fetch(channelsId.floTest)
+        let channel = await bot.channels.fetch(channelsId.striEdt)
         const fetched = await channel.messages.fetch({limit: 100})
         channel.bulkDelete(fetched).catch(err => {})
 
