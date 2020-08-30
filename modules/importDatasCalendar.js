@@ -65,7 +65,7 @@ Date.prototype.isBetween = async function(ignorePeriods){
 }
 
 async function deleteGoogleCalendar(semaines){
-    let dateAjd = new Date(moment().tz("Europe/Paris").format())
+    let dateAjd = new Date()
     let annee = dateAjd.getFullYear()
     if(semaines[0].getNumeroMois()-1 > dateAjd.getMonth() && semaines[0].getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
         annee -= 1
@@ -75,7 +75,7 @@ async function deleteGoogleCalendar(semaines){
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
 
     let params = {
-        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+0${dateAjd.getTimezoneOffset()/-60}:00`,
+        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00${moment().tz("Europe/Paris").format('Z')}`,
         showDeleted: false,
         singleEvents: true,
         maxResults: 2500
@@ -107,7 +107,7 @@ async function deleteGoogleCalendar(semaines){
 }
 
 async function insertGoogleCalendar(semaines){
-    let dateAjd = new Date(moment().tz("Europe/Paris").format())
+    let dateAjd = new Date()
     let annee = dateAjd.getFullYear()
 
     const ignorePeriods = await getIgnorePeriods()
@@ -138,8 +138,8 @@ async function insertGoogleCalendar(semaines){
                             "summary": `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`,
                             "description": "#Generated",
                             "location": cour.getLieu(),
-                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${dateAjd.getTimezoneOffset()/-60}:00`},
-                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${dateAjd.getTimezoneOffset()/-60}:00`}
+                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00${moment().tz("Europe/Paris").format('Z')}`},
+                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00${moment().tz("Europe/Paris").format('Z')}`}
                         }
     
                         let redo

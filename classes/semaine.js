@@ -95,7 +95,7 @@ module.exports = class Semaine{
      * @param {*} dateDebut Date et heure de début du cours
      */
     async removeCours(nomCours, dateDebut){
-        let dateAjd = new Date(moment().tz("Europe/Paris").format())
+        let dateAjd = new Date()
         let annee = dateAjd.getFullYear()
 
         let cptJour = 0
@@ -114,7 +114,7 @@ module.exports = class Semaine{
                     let month = date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1
                     let day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()
                     
-                if(dateDebut == `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${dateAjd.getTimezoneOffset()/-60}:00` && nomCours.includes(cour.getTitre())){
+                if(dateDebut == `${annee}-${month}-${day}T${cour.getHeureDebut()}:00${moment().tz("Europe/Paris").format('Z')}` && nomCours.includes(cour.getTitre())){
                         cours.splice(cours.indexOf(cour), 1)
                     }
                 }
