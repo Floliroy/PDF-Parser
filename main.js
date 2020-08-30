@@ -24,6 +24,13 @@ const blueNode = "\x1b[36m"
 const oranNode = "\x1b[33m"
 const resetNode = "\x1b[0m"
 
+const urlLogoStri = "https://lh3.googleusercontent.com/proxy/VEi50kVBko8KmuuH6vLVOcns7pOwPwGe3CfKzHCrWGOH3npl-xlD-cXagNjFDy1I4oDZ6zFZO1xTpk7cKA_TY2VZLKs1"
+
+const channelsId = {
+    floTest: "747366976434864188",
+    striBot: "693103241222684693"
+}
+
 ///////////////////
 //// LISTENERS ////
 ///////////////////
@@ -38,13 +45,51 @@ bot.on("ready", () => {
  * Quand le bot recois un message
  */
 bot.on("message", msg => {
+    if(msg.channel.id != channelsId.floTest && msg.channel.id != channelsId.striBot) return
+
     if (msg.content === "!ping") {
         msg.reply("Pong!")
-    }else if(msg.content === "!import"){
-        extractAndImport(true)
-        msg.delete()
+    }else if(msg.content.toLowerCase() === "!help"){
+        let embed = new Discord.MessageEmbed()
+            .setTitle("PDF-Parser Bot")
+            .setAuthor("Floliroy", "https://avatars2.githubusercontent.com/u/45274794", "https://github.com/Floliroy/PDF-Parser")
+            .setDescription("Le bot ne permet pour le moment que de parser l'emploi du temps pour les alternants.\n\n"
+                + "Le lien de l'agenda permet de l'ajouter sur votre compte google.\n"
+                + "La BDD permet de définir une plage de jours 'ignorés' tel que les jours en entreprise, merci de ne pas laisser de ligne vide entre deux lignes dans cette BDD.")
+            .addField("Google Calendar (Agenda)", "https://calendar.google.com/calendar?cid=YTZrY2Z0aW0zbGxpa2Q1cGdsZGxxcWZtY29AZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ")
+            .addField("Google Spreadsheet (BDD)", "https://docs.google.com/spreadsheets/d/1z_PGdOYQkqldGE9pzWVByTnnu2NirnkFK02AtduKInM/edit")
+            .setThumbnail(urlLogoStri)
+        msg.channel.send(embed)
+    }else if(msg.content.toLowerCase() === "!import"){
+        importMessage(msg)
     }
 })
+
+async function importMessage(msg){
+    let embed = new Discord.MessageEmbed()
+        .setTitle("Importation")
+        .addField("Demande", (msg.member.nickname ? msg.member.nickname : msg.author.username), true)
+        .addField("Status", "En Cours", true)
+        .setThumbnail(urlLogoStri)
+    let messageEmbed = await msg.channel.send(embed)
+
+    embed = new Discord.MessageEmbed()
+        .setTitle("Importation")
+        .addField("Demande", (msg.member.nickname ? msg.member.nickname : msg.author.username), true)
+        .setThumbnail(urlLogoStri)
+
+    await extractAndImport(true)
+        .then(() => {
+            embed.addField("Status", "Terminé", true)
+        })
+        .catch(err => {
+            embed.addField("Status", "Erreur", true)
+            console.log(err)
+        })
+
+    messageEmbed.edit(embed)
+
+}
 
 /**
  * Cron à 22h00
@@ -93,7 +138,7 @@ async function extractAndImport(force){
 
     console.log(" Update needed:", update)
     if(update || force){
-        ImportDatasCalendar.import(semaines)
+        await ImportDatasCalendar.import(semaines)
     }
 }
 
