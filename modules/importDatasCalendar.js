@@ -15,6 +15,8 @@ const doc = new GoogleSpreadsheet(spreadsheetId)
 /**
  * Personnal globals
  */
+let moment = require('moment-timezone')
+
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
 const oranNode = "\x1b[33m"
@@ -63,7 +65,7 @@ Date.prototype.isBetween = async function(ignorePeriods){
 }
 
 async function deleteGoogleCalendar(semaines){
-    let dateAjd = new Date()
+    let dateAjd = new Date(moment().tz("Europe/Paris").format())
     let annee = dateAjd.getFullYear()
     if(semaines[0].getNumeroMois()-1 > dateAjd.getMonth() && semaines[0].getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
         annee -= 1
@@ -74,7 +76,7 @@ async function deleteGoogleCalendar(semaines){
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
 
     let params = {
-        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+0${/*dateAjd.getTimezoneOffset()/-60*/2}:00`,
+        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00+0${dateAjd.getTimezoneOffset()/-60}:00`,
         showDeleted: false,
         singleEvents: true,
         maxResults: 2500
@@ -106,7 +108,7 @@ async function deleteGoogleCalendar(semaines){
 }
 
 async function insertGoogleCalendar(semaines){
-    let dateAjd = new Date()
+    let dateAjd = new Date(moment().tz("Europe/Paris").format())
     let annee = dateAjd.getFullYear()
 
     const ignorePeriods = await getIgnorePeriods()
@@ -137,8 +139,8 @@ async function insertGoogleCalendar(semaines){
                             "summary": `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`,
                             "description": "#Generated",
                             "location": cour.getLieu(),
-                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${/*date.getTimezoneOffset()/-60*/2}:00`},
-                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${/*date.getTimezoneOffset()/-60*/2}:00`}
+                            "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00+0${date.getTimezoneOffset()/-60}:00`},
+                            "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00+0${date.getTimezoneOffset()/-60}:00`}
                         }
     
                         let redo

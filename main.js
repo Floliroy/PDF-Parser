@@ -10,6 +10,7 @@ const bot = new Discord.Client()
  * Cron globals
  */
 const cron = require('node-cron')
+let moment = require('moment-timezone')
 
 /**
  * Personnal globals
@@ -17,7 +18,7 @@ const cron = require('node-cron')
 const ExtractDatasPDF = require('./modules/extractDatasPDF.js')
 const ImportDatasCalendar = require('./modules/importDatasCalendar.js')
 let semaines
-const date = new Date()
+const date = new Date(moment().tz("Europe/Paris").format())
 
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
@@ -96,7 +97,8 @@ async function importMessage(msg){
 /**
  * Cron à 22h00
  */
-cron.schedule(`59 ${getHour(21)} * * *`, function() {
+cron.schedule(`0 ${getHour(22)} * * *`, function() {
+    console.log(oranNode, "Cron 22h00 Started", resetNode)
     extractAndImport(false)
 }, {timezone: "Europe/Paris"})
 /**
@@ -151,7 +153,7 @@ async function getToday(){
         extract = await ExtractDatasPDF.extract()
         semaines = extract.semaines
     }
-    const today = new Date()
+    const today = new Date(moment().tz("Europe/Paris").format())
     let annee = today.getFullYear()
     
     for await(semaine of semaines){
@@ -178,7 +180,7 @@ async function getToday(){
  * @param {*} hour L'heure a récupérer
  */
 function getHour(hour){
-    return hour + 2//date.getTimezoneOffset()/-60 + 1
+    return hour + date.getTimezoneOffset()/-60 + 1
 }
 
 /**
