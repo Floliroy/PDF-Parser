@@ -178,7 +178,7 @@ async function getToday(){
  * @param {*} hour L'heure a récupérer
  */
 function getHour(hour){
-    return hour + date.getTimezoneOffset()/60 + 1
+    return hour + date.getTimezoneOffset()/-60// + 1
 }
 
 /**
