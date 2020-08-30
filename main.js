@@ -117,6 +117,7 @@ async function dailyMessage(){
     const today = await getToday()
     
     if(today){
+        await today.reorder()
         const cours = await today.getCours()
 
         let channel = await bot.channels.fetch(channelsId.floTest)

@@ -51,7 +51,7 @@ module.exports = class Jour{
         while(this.#cours.length > 0){
             let min = 1000000
             let courToAdd
-            for await(cour of this.#cours){
+            for await(const cour of this.#cours){
                 if(cour.getStartCoordX() < min){
                     min = cour.getStartCoordX
                     courToAdd = cour
