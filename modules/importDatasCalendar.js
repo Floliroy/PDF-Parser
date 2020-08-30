@@ -74,7 +74,7 @@ async function deleteGoogleCalendar(semaines){
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
 
     let params = {
-        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00-0${date.getTimezoneOffset()/-60}:00`,
+        timeMin: `${annee}-${semaines[0].getNumeroMois()}-${numeroJour}T00:00:00-0${dateAjd.getTimezoneOffset()/-60}:00`,
         showDeleted: false,
         singleEvents: true,
         maxResults: 2500
