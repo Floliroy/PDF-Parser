@@ -96,7 +96,7 @@ async function importMessage(msg){
 /**
  * Cron à 22h00
  */
-cron.schedule(`0 ${getHour(22)} * * *`, function() {
+cron.schedule(`59 ${getHour(21)} * * *`, function() {
     extractAndImport(false)
 }, {timezone: "Europe/Paris"})
 /**
@@ -178,7 +178,7 @@ async function getToday(){
  * @param {*} hour L'heure a récupérer
  */
 function getHour(hour){
-    return hour + date.getTimezoneOffset()/-60// + 1
+    return hour + 2//date.getTimezoneOffset()/-60 + 1
 }
 
 /**
