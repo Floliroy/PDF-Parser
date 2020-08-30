@@ -96,7 +96,7 @@ async function importMessage(msg){
 /**
  * Cron à 22h00
  */
-cron.schedule(`0 22 * * *`, function() {
+cron.schedule(`0 ${getHour(22)} * * *`, function() {
     console.log(oranNode, "Cron 22h00 Started", resetNode)
     extractAndImport(false)
 }, {timezone: "Europe/Paris"})
@@ -179,7 +179,7 @@ async function getToday(){
  * @param {*} hour L'heure a récupérer
  */
 function getHour(hour){
-    return hour + parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3))
+    return hour - parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3)) + 1
 }
 
 /**
