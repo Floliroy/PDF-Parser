@@ -96,7 +96,7 @@ async function importMessage(msg){
 /**
  * Cron à 22h00
  */
-cron.schedule(`59 ${getHour(20)} * * *`, function() {
+cron.schedule(`0 22 * * *`, function() {
     console.log(oranNode, "Cron 22h00 Started", resetNode)
     extractAndImport(false)
 }, {timezone: "Europe/Paris"})
