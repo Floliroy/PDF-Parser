@@ -40,8 +40,7 @@ const channelsId = {
  * Quand le bot démarre
  */
 bot.on("ready", () => {
-    console.log(`Logged in as ${bot.user.tag}!`)   
-    ExtractDatasCalendar.dailyMessage(bot)	
+    console.log(`Logged in as ${bot.user.tag}!`)
 })
 
 /**

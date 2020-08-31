@@ -48,10 +48,12 @@ module.exports = class ExtractDatasCalendar{
                 .setTitle(`Emploi du temps - ${listeJours[today.getDay()-1]}`)
                 .setDescription(" \n")
                 .setThumbnail(urlLogoStri)
-            for await(const cour of cours){   
-                const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
-                const heureFin = getFormatedTime(new Date(cour.end.dateTime))
-                embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
+            for await(const cour of cours){  
+                if(!cour.summary.toLowerCase().includes("UNIQUEMENT") && !cour.summary.toLowerCase().includes("ANNUL")){
+                    const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
+                    const heureFin = getFormatedTime(new Date(cour.end.dateTime))
+                    embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
+                }
             }
             channel.send(embed)
         }else{
@@ -62,7 +64,7 @@ module.exports = class ExtractDatasCalendar{
 } 
 
 function getFormatedTime(date){
-    let heureDebut = getFormatedTwoDigit(date.getHours() - parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3)))
+    let heureDebut = getFormatedTwoDigit(date.getHours() + parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3)))
     let minuteDebut = getFormatedTwoDigit(date.getMinutes())
 
     return `${heureDebut}:${minuteDebut}`
