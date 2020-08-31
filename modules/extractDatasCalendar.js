@@ -24,7 +24,7 @@ const oranNode = "\x1b[33m"
 const resetNode = "\x1b[0m"
 
 const listeJours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"]
-const urlLogoStri = "https://lh3.googleusercontent.com/proxy/VEi50kVBko8KmuuH6vLVOcns7pOwPwGe3CfKzHCrWGOH3npl-xlD-cXagNjFDy1I4oDZ6zFZO1xTpk7cKA_TY2VZLKs1"
+const urlLogoStri = "https://cdn.discordapp.com/attachments/749446918823739392/750029146389872720/fajHGyWqQt8VMO76rAuaRd0YPgBdg9PlH-p-_IwK1hBlk6RMGFx6Y54p0VlmABSm9aXXEAvVqi8ceFme3zngsJXXIiLr.png"
 
 const channelsId = {
     floTest: "747366976434864188",
@@ -46,14 +46,13 @@ module.exports = class ExtractDatasCalendar{
     
             let embed = new Discord.MessageEmbed()
                 .setTitle(`Emploi du temps - ${listeJours[today.getDay()-1]}`)
-                .setDescription("\u200B\n")
                 .setThumbnail(urlLogoStri)
             for await(const cour of cours){  
                 if(!cour.summary.toLowerCase().includes("uniquement") && !cour.summary.toLowerCase().includes("annul")){
+                    embed.addField("\u200B","\u200B", true)
                     const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
                     const heureFin = getFormatedTime(new Date(cour.end.dateTime))
                     embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
-                    embed.addField("\u200B","\u200B", true)
                 }
             }
             channel.send(embed)
