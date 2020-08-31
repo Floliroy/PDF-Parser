@@ -64,9 +64,9 @@ bot.on("message", msg => {
             .setThumbnail(urlLogoStri)
         msg.channel.send(embed)
     }else if(msg.content.toLowerCase() === "!import"){
-        importMessage(msg)
+        //importMessage(msg)
     }else if(msg.content.toLowerCase() === "!daily"){
-        ExtractDatasCalendar.dailyMessage(bot)
+        //ExtractDatasCalendar.dailyMessage(bot)
     }
 })
 
@@ -75,21 +75,21 @@ bot.on("message", msg => {
  */
 cron.schedule(`0 ${getHour(22)} * * *`, function() {
     console.log(oranNode, "Cron 22h00 Started", resetNode)
-    extractAndImport(false)
+    //extractAndImport(false)
 }, {timezone: "Europe/Paris"})
 /**
  * Cron à 06h00
  */
 cron.schedule(`0 ${getHour(6)} * * *`, function() {
     console.log(oranNode, "Cron 06h00 Started", resetNode)
-    extractAndImport(false)
+    //extractAndImport(false)
 }, {timezone: "Europe/Paris"})
 /**
  * Cron à 07h00
  */
 cron.schedule(`0 ${getHour(7)} * * *`, function() {
     console.log(oranNode, "Cron 07h00 Started", resetNode)
-    ExtractDatasCalendar.dailyMessage(bot)
+    //ExtractDatasCalendar.dailyMessage(bot)
 }, {timezone: "Europe/Paris"})
 
 
@@ -110,13 +110,13 @@ function getHour(hour){
  * @param {*} force Si ont doit forcer l'import meme s'il n'est pas nécessaire
  */
 async function extractAndImport(force){
-    //retour = await ExtractDatasPDF.extract()
+    retour = await ExtractDatasPDF.extract()
     semaines = retour.semaines
     update = retour.update
 
     console.log(" Update needed:", update)
     if(update || force){
-        //await ImportDatasCalendar.import(semaines)
+        await ImportDatasCalendar.import(semaines)
         if(!force){
             const texte = "L'emploi du temps a été mis à jour sur le Google Agenda !"
             let channel = await bot.channels.fetch(channelsId.striInfo)
