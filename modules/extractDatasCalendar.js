@@ -46,13 +46,14 @@ module.exports = class ExtractDatasCalendar{
     
             let embed = new Discord.MessageEmbed()
                 .setTitle(`Emploi du temps - ${listeJours[today.getDay()-1]}`)
-                .setDescription(" \n")
+                .setDescription("\u200B\n")
                 .setThumbnail(urlLogoStri)
             for await(const cour of cours){  
-                if(!cour.summary.toLowerCase().includes("UNIQUEMENT") && !cour.summary.toLowerCase().includes("ANNUL")){
+                if(!cour.summary.toLowerCase().includes("uniquement") && !cour.summary.toLowerCase().includes("annul")){
                     const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
                     const heureFin = getFormatedTime(new Date(cour.end.dateTime))
                     embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
+                    embed.addField("\u200B","\u200B", true)
                 }
             }
             channel.send(embed)
