@@ -117,7 +117,7 @@ async function extractAndImport(force){
     console.log(" Update needed:", update)
     if(update || force){
         await ImportDatasCalendar.import(semaines)
-        if(update || force){
+        if(update){
             const texte = "L'emploi du temps a été mis à jour sur le Google Agenda !"
             let channel = await bot.channels.fetch(channelsId.striInfo)
             await channel.messages.fetch({limit: 100}).then(async function(messages){
