@@ -83,7 +83,7 @@ async function deleteGoogleCalendar(semaines){
     
 	await cal.Events.list(calendarId, params).then(async function(jsons){
 
-        for await(const json of jsons){
+        for(const json of jsons){
             if(json.description == "#Generated"){
                 let redo
                 do{
