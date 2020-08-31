@@ -25,7 +25,7 @@ const blueNode = "\x1b[36m"
 const oranNode = "\x1b[33m"
 const resetNode = "\x1b[0m"
 
-const urlLogoStri = "https://cdn.discordapp.com/attachments/749446918823739392/750029146389872720/fajHGyWqQt8VMO76rAuaRd0YPgBdg9PlH-p-_IwK1hBlk6RMGFx6Y54p0VlmABSm9aXXEAvVqi8ceFme3zngsJXXIiLr.png"
+const urlLogoStri = "https://i.ibb.co/SBwvsWk/unnamed.png"
 
 const channelsId = {
     floTest: "747366976434864188",
