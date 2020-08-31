@@ -121,7 +121,7 @@ async function extractAndImport(force){
             const texte = "L'emploi du temps a été mis à jour sur le Google Agenda !"
             let channel = await bot.channels.fetch(channelsId.striInfo)
             await channel.messages.fetch({limit: 100}).then(async function(messages){
-                for await(let message of messages){
+                for await(let message of messages.array()){
                     if(message.content == texte){
                         message.delete()
                     }
