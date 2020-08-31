@@ -44,26 +44,6 @@ module.exports = class Jour{
     }
 
     /**
-     * Permet d'organiser les cours en fonction de leurs heure de début
-     */
-    async reorder(){
-        let newCours = new Array()
-        while(this.#cours.length > 0){
-            let min = 1000000
-            let courToAdd
-            for await(const cour of this.#cours){
-                if(cour.getStartCoordX() < min){
-                    min = cour.getStartCoordX
-                    courToAdd = cour
-                }
-            }
-            newCours.push(courToAdd)
-            this.#cours.splice(this.#cours.indexOf(courToAdd), 1)
-        }
-        this.#cours = newCours
-    }
-
-    /**
      * Récupère le dernier cours de la liste
      */
     getDernierCours(){

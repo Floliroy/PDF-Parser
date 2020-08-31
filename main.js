@@ -16,6 +16,7 @@ let moment = require('moment-timezone')
  * Personnal globals
  */
 const ExtractDatasPDF = require('./modules/extractDatasPDF.js')
+const ExtractDatasCalendar = require('./modules/extractDatasCalendar.js')
 const ImportDatasCalendar = require('./modules/importDatasCalendar.js')
 let semaines
 
@@ -64,10 +65,64 @@ bot.on("message", msg => {
     }else if(msg.content.toLowerCase() === "!import"){
         importMessage(msg)
     }else if(msg.content.toLowerCase() === "!daily"){
-        dailyMessage()
+        ExtractDatasCalendar.dailyMessage(bot)
     }
 })
 
+/**
+ * Cron à 22h00
+ */
+cron.schedule(`0 ${getHour(22)} * * *`, function() {
+    console.log(oranNode, "Cron 22h00 Started", resetNode)
+    extractAndImport(false)
+}, {timezone: "Europe/Paris"})
+/**
+ * Cron à 06h00
+ */
+cron.schedule(`0 ${getHour(6)} * * *`, function() {
+    console.log(oranNode, "Cron 06h00 Started", resetNode)
+    extractAndImport(false)
+}, {timezone: "Europe/Paris"})
+/**
+ * Cron à 07h00
+ */
+cron.schedule(`0 ${getHour(7)} * * *`, function() {
+    console.log(oranNode, "Cron 07h00 Started", resetNode)
+    ExtractDatasCalendar.dailyMessage(bot)
+}, {timezone: "Europe/Paris"})
+
+
+
+///////////////////
+//// FONCTIONS ////
+///////////////////
+/**
+ * Récupère une heure en fonction du fuseau horaire
+ * @param {*} hour L'heure a récupérer
+ */
+function getHour(hour){
+    return hour - parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3)) + 1
+}
+
+/**
+ * Extrait les données du PDF pour les import dans le Google Agenda
+ * @param {*} force Si ont doit forcer l'import meme s'il n'est pas nécessaire
+ */
+async function extractAndImport(force){
+    retour = await ExtractDatasPDF.extract()
+    semaines = retour.semaines
+    update = retour.update
+
+    console.log(" Update needed:", update)
+    if(update || force){
+        await ImportDatasCalendar.import(semaines)
+    }
+}
+
+/**
+ * Fonction affichant l'état de l'import forcé
+ * @param {*} msg Le message déclenchant la fonction
+ */
 async function importMessage(msg){
     let embed = new Discord.MessageEmbed()
         .setTitle("Importation")
@@ -91,110 +146,6 @@ async function importMessage(msg){
         })
 
     messageEmbed.edit(embed)
-}
-
-/**
- * Cron à 22h00
- */
-cron.schedule(`0 ${getHour(22)} * * *`, function() {
-    console.log(oranNode, "Cron 22h00 Started", resetNode)
-    extractAndImport(false)
-}, {timezone: "Europe/Paris"})
-/**
- * Cron à 06h00
- */
-cron.schedule(`0 ${getHour(6)} * * *`, function() {
-    console.log(oranNode, "Cron 06h00 Started", resetNode)
-    extractAndImport(false)
-}, {timezone: "Europe/Paris"})
-/**
- * Cron à 07h00
- */
-cron.schedule(`0 ${getHour(7)} * * *`, function() {
-    console.log(oranNode, "Cron 07h00 Started", resetNode)
-    dailyMessage()
-}, {timezone: "Europe/Paris"})
-
-async function dailyMessage(){
-    const today = await getToday()
-    
-    if(today){
-        await today.reorder()
-        const cours = await today.getCours()
-
-        let channel = await bot.channels.fetch(channelsId.striEdt)
-        const fetched = await channel.messages.fetch({limit: 100})
-        channel.bulkDelete(fetched).catch(err => {})
-
-        let embed = new Discord.MessageEmbed()
-            .setTitle(`Emploi du temps - ${today.getNom()}`)
-            .setThumbnail(urlLogoStri)
-        channel.send(embed)
-        for await(cour of cours){
-            if(!cour.isCoursIng()){
-                channel.send(cour.getEmbedMessage())
-            }
-        }
-    }else{
-        console.log(oranNode, "Not a School Day", resetNode)
-    }
-}
-
-///////////////////
-//// FONCTIONS ////
-///////////////////
-/**
- * Récupère le jour d'aujourd'hui avec sa lite de cours
- */
-async function getToday(){
-    let retour
-    if(!semaines){
-        extract = await ExtractDatasPDF.extract()
-        semaines = extract.semaines
-    }
-    const today = new Date()
-    let annee = today.getFullYear()
-    
-    for await(semaine of semaines){
-        let cptJour = 0
-        const jours = await semaine.getJours()
-        for await(jour of jours){
-            if(semaine.getNumeroMois()-1 > today.getMonth() && semaine.getNumeroMois()-1 > 7 && today.getMonth <= 7){
-                annee -= 1
-            }
-            let date = new Date(annee, semaine.getNumeroMois()-1, semaine.getNumeroPremierJourSemaine() + cptJour)
-            date.addDays(cptJour)
-            
-            if(date.getFullYear() == today.getFullYear() && date.getMonth() == today.getMonth() && date.getDate() == today.getDate()){
-                retour = jour
-            }
-            cptJour++
-        }
-    }
-    return retour
-}
-
-/**
- * Récupère une heure en fonction du fuseau horaire
- * @param {*} hour L'heure a récupérer
- */
-function getHour(hour){
-    return hour - parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3)) + 1
-}
-
-/**
- * Extrait les données du PDF pour les import dans le Google Agenda
- * @param {*} force Si ont doit forcer l'import meme s'il n'est pas nécessaire
- */
-async function extractAndImport(force){
-    retour = await ExtractDatasPDF.extract()
-    semaines = retour.semaines
-    update = retour.update
-
-    console.log(" Update needed:", update)
-    if(update || force){
-        await ImportDatasCalendar.import(semaines)
-    }
 }
 
 /**
