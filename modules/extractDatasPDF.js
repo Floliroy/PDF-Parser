@@ -64,7 +64,7 @@ async function downloadPDF(pdfURL, outputFilename) {
 async function extractDatas(semaines){
     try{
         const data = await pdfExtract.extract("EDT.pdf", {})
-
+        
         for(let i=0 ; i<=1 ; i++){
             for await(const element of data.pages[i].content){
                 if(element.x < 65){ //Titre d'une semaine
@@ -76,8 +76,10 @@ async function extractDatas(semaines){
                     for await(const elem of data.pages[i].content){
                         //On reboucle pour chercher les infos utiles a notre semaine
                         if(elem.y >= element.y-1 && elem.y <= element.y+85){
-                            if(elem.x > 104 && elem.fontName == "g_d0_f6"){ //Cours ou Lieu dans le tableau
-        
+                            const fontNameNum = parseInt(elem.fontName.replace(/g_d\d*_f/gi, "")) % 9
+
+                            if(elem.x > 104 && fontNameNum == 6){ //Cours ou Lieu dans le tableau
+                                
                                 if(elem.y - debutLigne >= 18){ //On est passé a une nouvelle ligne
                                     semaine.addJour(elem.y)
                                     debutLigne = elem.y
@@ -124,7 +126,7 @@ async function extractDatas(semaines){
                                 }
                             }
         
-                            if(elem.x > 104 && elem.fontName == "g_d0_f7"){ //Prof dans le tableau
+                            if(elem.x > 104 && fontNameNum == 7){ //Prof dans le tableau
                                 if(semaine.getDernierJour() && semaine.getDernierJour().getCoursParDebut(elem.x)){
                                     let coursModif = semaine.getDernierJour().getCoursParDebut(elem.x)
                                     coursModif.setProf(elem.str, elem.height)

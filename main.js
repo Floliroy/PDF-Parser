@@ -64,9 +64,9 @@ bot.on("message", msg => {
             .setThumbnail(urlLogoStri)
         msg.channel.send(embed)
     }else if(msg.content.toLowerCase() === "!import"){
-        //importMessage(msg)
+        importMessage(msg)
     }else if(msg.content.toLowerCase() === "!daily"){
-        //ExtractDatasCalendar.dailyMessage(bot)
+        ExtractDatasCalendar.dailyMessage(bot)
     }
 })
 
@@ -75,21 +75,21 @@ bot.on("message", msg => {
  */
 cron.schedule(`0 ${getHour(22)} * * *`, function() {
     console.log(oranNode, "Cron 22h00 Started", resetNode)
-    //extractAndImport(false)
+    extractAndImport(false)
 }, {timezone: "Europe/Paris"})
 /**
  * Cron à 06h00
  */
 cron.schedule(`0 ${getHour(6)} * * *`, function() {
     console.log(oranNode, "Cron 06h00 Started", resetNode)
-    //extractAndImport(false)
+    extractAndImport(false)
 }, {timezone: "Europe/Paris"})
 /**
  * Cron à 07h00
  */
 cron.schedule(`0 ${getHour(7)} * * *`, function() {
     console.log(oranNode, "Cron 07h00 Started", resetNode)
-    //ExtractDatasCalendar.dailyMessage(bot)
+    ExtractDatasCalendar.dailyMessage(bot)
 }, {timezone: "Europe/Paris"})
 
 
