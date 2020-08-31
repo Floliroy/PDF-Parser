@@ -37,7 +37,7 @@ module.exports = class ExtractDatasCalendar{
     static async dailyMessage(bot){
         const today = new Date()
         
-        if(today.getDay() > 5){
+        if(today.getDay() <= 5){
             const cours = await getTodayCours()
     
             let channel = await bot.channels.fetch(channelsId.striEdt)
@@ -46,11 +46,12 @@ module.exports = class ExtractDatasCalendar{
     
             let embed = new Discord.MessageEmbed()
                 .setTitle(`Emploi du temps - ${listeJours[today.getDay()-1]}`)
+                .setDescription(" \n")
                 .setThumbnail(urlLogoStri)
-            for await(cour of cours){   
+            for await(const cour of cours){   
                 const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
                 const heureFin = getFormatedTime(new Date(cour.end.dateTime))
-                embed.addField(`${heureDebut} - ${heureFin} ${cour.location?`(${cour.location})`:""}`, json.summary)
+                embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
             }
             channel.send(embed)
         }else{
@@ -61,24 +62,39 @@ module.exports = class ExtractDatasCalendar{
 } 
 
 function getFormatedTime(date){
-    let heureDebut = date.getHours() - parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3))
-    let minuteDebut = date.getMinutes()
-    heureDebut = heureDebut < 10 ? `0${heureDebut}` : heureDebut
-    minuteDebut = minuteDebut < 10 ? `0${minuteDebut}` : minuteDebut
+    let heureDebut = getFormatedTwoDigit(date.getHours() - parseInt(moment().tz("Europe/Paris").format('Z').slice(2,3)))
+    let minuteDebut = getFormatedTwoDigit(date.getMinutes())
 
     return `${heureDebut}:${minuteDebut}`
+}
+
+function getFormatedTwoDigit(number){
+    return number < 10 ? `0${number}` : number
+}
+
+/**
+ * Ajoute des jours a la date
+ */
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf())
+    date.setDate(date.getDate() + days)
+    return date
 }
 
 async function getTodayCours(){
     let cours = new Array()
 
     const date = new Date()
+    const tomorrow = await date.addDays(1)
+
     let params = {
-        timeMin: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}T02:00:00${moment().tz("Europe/Paris").format('Z')}`,
-        timeMax: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}T22:00:00${moment().tz("Europe/Paris").format('Z')}`,
+        timeMin: `${date.getFullYear()}-${getFormatedTwoDigit(date.getMonth()+1)}-${getFormatedTwoDigit(date.getDate())}T00:00:00${moment().tz("Europe/Paris").format('Z')}`,
+        timeMax: `${tomorrow.getFullYear()}-${getFormatedTwoDigit(tomorrow.getMonth()+1)}-${getFormatedTwoDigit(tomorrow.getDate())}T00:00:00${moment().tz("Europe/Paris").format('Z')}`,
         showDeleted: false,
-        singleEvents: true
+        singleEvents: true,
+		orderBy: 'startTime'
     }
+
     await cal.Events.list(calendarId, params).then(async function(jsons){
         for await(const json of jsons){
             if(json.description == "#Generated" || json.description.startsWith("#NoDelete")){
