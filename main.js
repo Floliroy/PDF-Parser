@@ -110,14 +110,14 @@ function getHour(hour){
  * @param {*} force Si ont doit forcer l'import meme s'il n'est pas nécessaire
  */
 async function extractAndImport(force){
-    retour = await ExtractDatasPDF.extract()
+    //retour = await ExtractDatasPDF.extract()
     semaines = retour.semaines
     update = retour.update
 
     console.log(" Update needed:", update)
     if(update || force){
-        await ImportDatasCalendar.import(semaines)
-        if(update){
+        //await ImportDatasCalendar.import(semaines)
+        if(!force){
             const texte = "L'emploi du temps a été mis à jour sur le Google Agenda !"
             let channel = await bot.channels.fetch(channelsId.striInfo)
             await channel.messages.fetch({limit: 100}).then(async function(messages){

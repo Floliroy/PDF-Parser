@@ -2,7 +2,7 @@
  * PDF extract globals
  */
 const PDFExtract = require('pdf.js-extract').PDFExtract
-let pdfExtract
+const pdfExtract = new PDFExtract()
 
 const pdfParser = require('pdf-parse');
 
@@ -28,7 +28,6 @@ module.exports = class ExtractDatasPDF{
     static async extract(){
         try{
             let semaines = new Array()
-            pdfExtract = new PDFExtract()
 
             //On récupère la version du pdf actuel
             const prevVersion = await getVersion()
