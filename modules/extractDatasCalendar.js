@@ -29,7 +29,8 @@ const urlLogoStri = "https://i.ibb.co/SBwvsWk/unnamed.png"
 const channelsId = {
     floTest: "747366976434864188",
     striBot: "693103241222684693",
-    striEdt: "749446918823739392"
+    striEdt: "749446918823739392",
+    striInfo:"747515620660084947"
 }
 
 module.exports = class ExtractDatasCalendar{

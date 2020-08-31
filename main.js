@@ -30,7 +30,8 @@ const urlLogoStri = "https://i.ibb.co/SBwvsWk/unnamed.png"
 const channelsId = {
     floTest: "747366976434864188",
     striBot: "693103241222684693",
-    striEdt: "749446918823739392"
+    striEdt: "749446918823739392",
+    striInfo:"747515620660084947"
 }
 
 ///////////////////
@@ -116,6 +117,18 @@ async function extractAndImport(force){
     console.log(" Update needed:", update)
     if(update || force){
         await ImportDatasCalendar.import(semaines)
+        if(update || force){
+            const texte = "L'emploi du temps a été mis à jour sur le Google Agenda !"
+            let channel = await bot.channels.fetch(channelsId.striInfo)
+            await channel.messages.fetch({limit: 100}).then(async function(messages){
+                for await(let message of messages){
+                    if(message.content == texte){
+                        message.delete()
+                    }
+                }
+            })
+            channel.send(texte)
+        }
     }
 }
 
