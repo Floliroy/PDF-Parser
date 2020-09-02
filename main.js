@@ -59,7 +59,7 @@ bot.on("message", msg => {
             .setDescription("Le bot ne permet pour le moment que de parser l'emploi du temps pour les alternants.\n\n"
                 + "Le lien de l'agenda permet de l'ajouter sur votre compte google.\n"
                 + "La BDD permet de définir une plage de jours 'ignorés' tel que les jours en entreprise, merci de ne pas laisser de ligne vide entre deux lignes dans cette BDD.")
-            .addField("Google Calendar (Agenda)", "https://calendar.google.com/calendar?cid=YTZrY2Z0aW0zbGxpa2Q1cGdsZGxxcWZtY29AZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ")
+            .addField("Google Calendar (Agenda)", "https://calendar.google.com/calendar?cid=amdmNmc5YW04OXUydmo5MzgyNGNrOTRqODhAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ")
             .addField("Google Spreadsheet (BDD)", "https://docs.google.com/spreadsheets/d/1z_PGdOYQkqldGE9pzWVByTnnu2NirnkFK02AtduKInM/edit")
             .setThumbnail(urlLogoStri)
         msg.channel.send(embed)

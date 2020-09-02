@@ -4,7 +4,7 @@ const SERVICE_ACCT_ID = process.env.GOOGLE_EMAIL
 const KEY = process.env.GOOGLE_TOKEN.replace(/\\n/g, '\n')
 const TIMEZONE = "UTC+02:00"
 const CALENDAR_ID = {
-	"primary": "a6kcftim3llikd5pgldlqqfmco@group.calendar.google.com"
+	"primary": "jgf6g9am89u2vj93824ck94j88@group.calendar.google.com"
 }
 
 module.exports.serviceAcctId = SERVICE_ACCT_ID
