@@ -84,7 +84,7 @@ async function deleteGoogleCalendar(semaines){
 	await cal.Events.list(calendarId, params).then(async function(jsons){
 
         for(const json of jsons){
-            if(json.description == "#Generated"){
+            if(json.description && json.description == "#Generated"){
                 let redo
                 do{
                     redo = false
@@ -94,7 +94,7 @@ async function deleteGoogleCalendar(semaines){
                         console.log(JSON.parse(err.message))
                     })
                 }while(redo)
-            }else if(json.description.startsWith("#NoDelete")){
+            }else if(json.description && json.description.startsWith("#NoDelete")){
                 for(const semaine of semaines){
                     cours = await semaine.removeCours(json.summary, json.start.dateTime)
                 }
