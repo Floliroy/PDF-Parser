@@ -100,7 +100,7 @@ async function getTodayCours(){
 
     await cal.Events.list(calendarId, params).then(async function(jsons){
         for await(const json of jsons){
-            if(json.description == "#Generated" || json.description.startsWith("#NoDelete")){
+            if(json.description && (json.description == "#Generated" || json.description.startsWith("#NoDelete"))){
                 cours.push(json)
             }
         }
