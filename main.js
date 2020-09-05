@@ -67,8 +67,19 @@ bot.on("message", msg => {
         importMessage(msg)
     }else if(msg.content.toLowerCase() === "!daily"){
         ExtractDatasCalendar.dailyMessage(bot)
+    }else if(msg.content.toLowerCase() === "!test"){
+        test()
     }
 })
+
+async function test(){
+    retour = await ExtractDatasPDF.extract()
+    semaines = retour.semaines
+    
+    for await(semaine of semaines){
+        semaine.print()
+    }
+}
 
 /**
  * Cron à 22h00
