@@ -56,6 +56,7 @@ function getSecondesByCoord(coordX){
     if(coordX > 359-3 && coordX < 367+3){return 43200}
     if(coordX > 422-3 && coordX < 422+3){return 48600}
     if(coordX > 439-3 && coordX < 439+3){return 49500}
+    if(coordX > 558-3 && coordX < 558+3){return 55800}
     if(coordX > 563-3 && coordX < 563+3){return 56700}
     if(coordX > 597-3 && coordX < 597+3){return 57600}
     
