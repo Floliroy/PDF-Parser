@@ -52,13 +52,14 @@ function secondesToHeure(secondes, addHour){
  */
 function getSecondesByCoord(coordX){
     //On gère nos exceptions 
+    coordX -= 10
     if(coordX > 221-3 && coordX < 221+3){return 35100} //09h45
     if(coordX > 251-3 && coordX < 251+3){return 36000} //10h00
     if(coordX > 359-3 && coordX < 376+3){return 43200} //12h00
     if(coordX > 422-3 && coordX < 422+3){return 48600} //13h30
     if(coordX > 439-3 && coordX < 439+3){return 49500} //13h45
     //if(coordX > 558-3 && coordX < 563+3){return 56700} //15h45
-    if(coordX > 606-3 && coordX < 606+3){return 57600} //16h00
+    if(coordX > 596-3 && coordX < 606+3){return 57600} //16h00
     if(coordX > 628-3 && coordX < 628+3){return 60300} //16h45
     
     //Sinon on utilise une fonction polynomiale de degrès 4
