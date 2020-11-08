@@ -100,7 +100,7 @@ async function extractDatas(semaines){
                                             if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
 
                                                 let otherCours = semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)
-                                                if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
+                                                if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+4 > coursModif.getStartCoordY()){
                                                     coursModif.setCoursIng(true)
                                                     if(otherCours){
                                                         otherCours.setCoursAlt(true)
