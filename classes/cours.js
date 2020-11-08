@@ -66,6 +66,11 @@ module.exports = class Cours{
             this.#nextCoordX = 1000000
         }
 
+        if(titre.includes("Sport")){
+            this.#coursIng = true
+            this.#coursAlt = false
+        }
+
         this.#coordX = coordX
         this.#coordY = coordY
         this.#width  = width
