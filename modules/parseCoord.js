@@ -62,6 +62,7 @@ function getSecondesByCoord(coordX){
     if(coordX > 596-3 && coordX < 606+3){return 57600} //16h00
     if(coordX > 628-3 && coordX < 628+3){return 60300} //16h45
     if(coordX > 709-3 && coordX < 709+3){return 64800} //18h00
+    if(coordX > 749-3 && coordX < 749+3){return 67500} //19h00
     if(coordX > 764-3 && coordX < 767+3){return 68400} //19h00
     
     //Sinon on utilise une fonction polynomiale de degrès 4

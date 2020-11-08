@@ -83,7 +83,7 @@ async function extractDatas(semaines){
                                 
                                 if(elem.y - debutLigne >= 18){ //On est passé a une nouvelle ligne
                                     if(elem.y - debutLigne >= 36 && debutLigne != 0){
-                                        semaine.addJour(elem.y)
+                                        semaine.addJour(elem.y - 18)
                                     }
                                     semaine.addJour(elem.y)
                                     debutLigne = elem.y
@@ -100,7 +100,7 @@ async function extractDatas(semaines){
                                             if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
 
                                                 let otherCours = semaine.getJourEntreCoord(elem.y).getOtherCoursParDebut(coursModif)
-                                                if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+4 > coursModif.getStartCoordY()){
+                                                if(semaine.getJourEntreCoord(elem.y).getStartCoordY()+5 > coursModif.getStartCoordY()){
                                                     coursModif.setCoursIng(true)
                                                     if(otherCours){
                                                         otherCours.setCoursAlt(true)
