@@ -82,6 +82,9 @@ async function extractDatas(semaines){
                             if(elem.x > 104 && fontNameNum == 6){ //Cours ou Lieu dans le tableau
                                 
                                 if(elem.y - debutLigne >= 18){ //On est passé a une nouvelle ligne
+                                    if(elem.y - debutLigne >= 36 && debutLigne != 0){
+                                        semaine.addJour(elem.y)
+                                    }
                                     semaine.addJour(elem.y)
                                     debutLigne = elem.y
                                 }
