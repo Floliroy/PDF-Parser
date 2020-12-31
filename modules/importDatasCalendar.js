@@ -122,13 +122,12 @@ async function insertGoogleCalendar(semaines){
                 
                 if(!cour.isCoursIng()){
 
-                    if(semaine.getNumeroMois()-1 > dateAjd.getMonth() && semaine.getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
-                        annee -= 1
+                    if(semaine.getNumeroMois()-1 < dateAjd.getMonth()){
+                        annee += 1
                     }
                     let date = new Date(annee, semaine.getNumeroMois()-1, semaine.getNumeroPremierJourSemaine() + cptJour, 
                                         cour.getHeureDebut().slice(0,2), cour.getHeureDebut().slice(-2))
                     date.addDays(cptJour)
-                    annee = date.getFullYear()
 
                     const isBetween = await date.isBetween(ignorePeriods)
                     if(!isBetween){
