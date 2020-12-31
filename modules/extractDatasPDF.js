@@ -77,7 +77,7 @@ async function extractDatas(semaines){
                     for await(const elem of data.pages[i].content){
                         //On reboucle pour chercher les infos utiles a notre semaine
                         if(elem.y >= element.y-1 && elem.y <= element.y+85){
-                            const fontNameNum = parseInt(elem.fontName.replace(/g_d\d*_f/gi, "")) % 9
+                            const fontNameNum = parseInt(elem.fontName.replace(/g_d\d*_f/gi, "")) % 7
 
                             if(elem.x > 104 && fontNameNum == 6){ //Cours ou Lieu dans le tableau
                                 
