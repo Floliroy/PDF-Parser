@@ -3,7 +3,7 @@ let moment = require('moment-timezone')
 const Jour = require('./jour.js')
 
 const listeJours = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"]
-const listeMois  = ["janv", "fev", "mars", "avril", "mai", "juin", "juill", "août", "sept", "oct", "nov", "dec"]
+const listeMois  = ["janv", "fev", "mars", "avril", "mai", "juin", "juill", "août", "sept", "oct", "nov", "déc"]
 
 module.exports = class Semaine{
     /** Le nom de la semaine */
