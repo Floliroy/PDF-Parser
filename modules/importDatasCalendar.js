@@ -141,7 +141,7 @@ async function insertGoogleCalendar(semaines){
                             "start": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureDebut()}:00${moment().tz("Europe/Paris").format('Z')}`},
                             "end": {"dateTime": `${annee}-${month}-${day}T${cour.getHeureFin()}:00${moment().tz("Europe/Paris").format('Z')}`}
                         }
-    
+                        console.log("Add", `${cour.getTitre()}${cour.getProf() ? " - " + cour.getProf() : ""}`)
                         let redo
                         do{
                             redo = false
@@ -151,6 +151,8 @@ async function insertGoogleCalendar(semaines){
                                 console.log(event, JSON.parse(err.message))
                             })
                         }while(redo)
+                    }else{
+                        console.log(isBetween, date)
                     }
                 }
             }
