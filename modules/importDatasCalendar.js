@@ -67,9 +67,9 @@ Date.prototype.isBetween = async function(ignorePeriods){
 async function deleteGoogleCalendar(semaines){
     let dateAjd = new Date()
     let annee = dateAjd.getFullYear()
-    /*if(semaines[0].getNumeroMois()-1 > dateAjd.getMonth() && semaines[0].getNumeroMois()-1 > 7 && dateAjd.getMonth <= 7){
+    if(semaines[0].getNumeroMois()-1 > dateAjd.getMonth()){
         annee -= 1
-    }*/
+    }
 
     let numeroJour = semaines[0].getNumeroPremierJourSemaine()
     numeroJour = numeroJour < 10 ? `0${numeroJour}` : numeroJour
