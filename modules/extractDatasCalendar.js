@@ -40,23 +40,24 @@ module.exports = class ExtractDatasCalendar{
         
         if(today.getDay() <= 5){
             const cours = await getTodayCours()
-    
-            let channel = await bot.channels.fetch(channelsId.striEdt)
-            const fetched = await channel.messages.fetch({limit: 100})
-            channel.bulkDelete(fetched).catch(err => {})
-    
-            let embed = new Discord.MessageEmbed()
-                .setTitle(`Emploi du temps - ${listeJours[today.getDay()-1]}`)
-                .setThumbnail(urlLogoStri)
-            for await(const cour of cours){  
-                if(!cour.summary.toLowerCase().includes("uniquement") && !cour.summary.toLowerCase().includes("annul")){
-                    embed.addField("\u200B","\u200B", true)
-                    const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
-                    const heureFin = getFormatedTime(new Date(cour.end.dateTime))
-                    embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
+            if(cours.length > 0){
+                let channel = await bot.channels.fetch(channelsId.striEdt)
+                const fetched = await channel.messages.fetch({limit: 100})
+                channel.bulkDelete(fetched).catch(err => {})
+        
+                let embed = new Discord.MessageEmbed()
+                    .setTitle(`Emploi du temps - ${listeJours[today.getDay()-1]}`)
+                    .setThumbnail(urlLogoStri)
+                for await(const cour of cours){  
+                    if(!cour.summary.toLowerCase().includes("uniquement") && !cour.summary.toLowerCase().includes("annul")){
+                        embed.addField("\u200B","\u200B", true)
+                        const heureDebut = getFormatedTime(new Date(cour.start.dateTime))
+                        const heureFin = getFormatedTime(new Date(cour.end.dateTime))
+                        embed.addField(`${heureDebut} - ${heureFin}`, `${cour.summary} ${cour.location?`(${cour.location})`:""}\n`)
+                    }
                 }
+                channel.send(embed)
             }
-            channel.send(embed)
         }else{
             console.log(oranNode, "Not a School Day", resetNode)
         }
