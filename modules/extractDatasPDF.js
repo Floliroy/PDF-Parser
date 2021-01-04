@@ -65,7 +65,7 @@ async function extractDatas(semaines){
     try{
         const data = await pdfExtract.extract("EDT.pdf", {})
         
-        for(let i=0 ; i<2 ; i++){
+        for(let i=0 ; i<1 ; i++){
 
             for await(const element of data.pages[i].content){
                 if(element.x < 65){ //Titre d'une semaine
