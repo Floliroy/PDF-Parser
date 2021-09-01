@@ -110,7 +110,7 @@ async function insertGoogleCalendar(semaines){
     let dateAjd = new Date()
     let annee = dateAjd.getFullYear()
 
-    const ignorePeriods = getIgnorePeriods()
+    const ignorePeriods = await getIgnorePeriods()
 
     for(const semaine of semaines){
         let cptJour = 0
