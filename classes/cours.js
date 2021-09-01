@@ -44,14 +44,24 @@ module.exports = class Cours{
      * @param {*} height Hauteur
      */
     constructor(titre, coordX, coordY, width, height, jour){
-        const regexTrois = RegExp("/* - [A-Z][A-Z][A-Z]")
-        const regexDeux  = RegExp("/* - [A-Z][A-Z]")
-        if(regexTrois.test(titre)){ //Prof avec trois lettres
+        const regexTrois = /.* - [A-Z][A-Z][A-Z]/
+        const regexDeux  = /.* - [A-Z][A-Z]/
+        const regexTroisBis = /.* \([A-Z][A-Z][A-Z]\)/
+        const regexDeuxBis  = /.* \([A-Z][A-Z]\)/
+        if(titre.match(regexTrois)){ //Prof avec trois lettres
             this.#prof = titre.slice(-3).trim()
             this.#titre = titre.slice(0, -6).trim()
             this.#profInName = true
-        }else if(regexDeux.test(titre)){ //Prof avec deux lettres
+        }else if(titre.match(regexDeux)){ //Prof avec deux lettres
             this.#prof = titre.slice(-2).trim()
+            this.#titre = titre.slice(0, -5).trim()
+            this.#profInName = true
+        }else if(titre.match(regexTroisBis)){ //Prof avec trois lettres
+            this.#prof = titre.slice(-5).trim()
+            this.#titre = titre.slice(0, -6).trim()
+            this.#profInName = true
+        }else if(titre.match(regexDeuxBis)){ //Prof avec deux lettres
+            this.#prof = titre.slice(-4).trim()
             this.#titre = titre.slice(0, -5).trim()
             this.#profInName = true
         }else if(titre.endsWith(" - ")){ //Fin inutile
@@ -59,6 +69,10 @@ module.exports = class Cours{
         }else{
             this.#titre = titre.trim()
         }
+        if(this.#titre.endsWith("(")){
+            this.#titre = this.#titre.slice(0, -1).trim()
+        }
+        this.#prof = this.#prof.replace("(", "").replace(")", "")
 
         if(jour && jour.getCoursFirstCoordX(coordX, coordY)){
             this.#nextCoordX = jour.getCoursFirstCoordX(coordX, coordY)
@@ -66,7 +80,7 @@ module.exports = class Cours{
             this.#nextCoordX = 1000000
         }
 
-        if(titre.includes("Sport") || titre.includes("sauf alt") || titre.includes("Ing")){
+        if(titre.includes("Sport") || titre.includes("sauf alt")){
             this.#coursIng = true
             this.#coursAlt = false
         }

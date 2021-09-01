@@ -42,6 +42,7 @@ const channelsId = {
  */
 bot.on("ready", () => {
     console.log(`Logged in as ${bot.user.tag}!`)
+    //test()
 })
 
 /**
@@ -73,10 +74,10 @@ bot.on("message", msg => {
 })
 
 async function test(){
-    retour = await ExtractDatasPDF.extract()
+    const retour = await ExtractDatasPDF.extract()
     semaines = retour.semaines
     
-    for await(semaine of semaines){
+    for(const semaine of semaines){
         semaine.print()
     }
 }
@@ -121,9 +122,9 @@ function getHour(hour){
  * @param {*} force Si ont doit forcer l'import meme s'il n'est pas nécessaire
  */
 async function extractAndImport(force){
-    retour = await ExtractDatasPDF.extract()
+    const retour = await ExtractDatasPDF.extract()
     semaines = retour.semaines
-    update = retour.update
+    const update = retour.update
 
     console.log(" Update needed:", update)
     if(update || force){

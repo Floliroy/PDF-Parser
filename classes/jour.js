@@ -80,7 +80,7 @@ module.exports = class Jour{
                 if(!cours.isProfInName()){
                     difference = cours.getStartCoordX() - coordX
                     retour = cours.getStartCoordX()
-                }else if(cours.getStartCoordY()-1 < coordY && cours.getStartCoordY()+1 > coordY){
+                }else if(cours.getStartCoordY()-1.5 < coordY && cours.getStartCoordY()+1.5 > coordY){
                     difference = cours.getStartCoordX() - coordX
                     retour = cours.getStartCoordX()
                 }
@@ -97,7 +97,7 @@ module.exports = class Jour{
         let coursPossible = new Array()
         for(let cour of this.#cours){
             if(this.isDoubleCours(coordX)){
-                if(cour.getStartCoordX() <= coordX && cour.getNextCoordX() > coordX && (cour.getStartCoordY()-1 < coordY && cour.getStartCoordY()+1 > coordY)){
+                if(cour.getStartCoordX() <= coordX && cour.getNextCoordX() > coordX && (cour.getStartCoordY()-1.5 < coordY && cour.getStartCoordY()+1.5 > coordY)){
                     coursPossible.push(cour)
                 }
             }else{
