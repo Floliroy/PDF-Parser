@@ -30,13 +30,13 @@ module.exports = class ExtractDatasPDF{
             let semaines = new Array()
 
             //On récupère la version du pdf actuel
-            const prevVersion = await getVersion()
+            const prevVersion = getVersion()
     
             await downloadPDF(urlPdf, "EDT.pdf")
             console.log(blueNode, "PDF Downloaded", resetNode)
             
             //On récupère la nouvelle version du pdf
-            const lastVersion = await getVersion()
+            const lastVersion = getVersion()
 
             await extractDatas(semaines)
             console.log(blueNode, "Datas Extracted", resetNode)

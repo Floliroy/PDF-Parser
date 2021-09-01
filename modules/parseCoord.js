@@ -11,10 +11,10 @@ module.exports = class ParseCoord{
  * @param {*} min La minute que l'on cherche a récupérer de manière normalisée
  */
 function getClosest(min){
-    minutes = [0, 15, 30, 45, 60]
+    const minutes = [0, 15, 30, 45, 60]
 
-    closest = 0
-    lastCalc = 60
+    let closest = 0
+    let lastCalc = 60
     minutes.forEach(function(elem){
         //On cherche la distance la plus courte avec la minute passée
         if(Math.abs(elem - min) < lastCalc){
@@ -51,19 +51,15 @@ function secondesToHeure(secondes, addHour){
  * @param {*} coordX La coordonnée à transformer
  */
 function getSecondesByCoord(coordX){
-    //On gère nos exceptions 
-    coordX -= 10
-    if(coordX > 216-3 && coordX < 221+3){return 35100} //09h45
-    if(coordX > 251-3 && coordX < 251+3){return 36000} //10h00
-    if(coordX > 359-3 && coordX < 376+3){return 43200} //12h00
-    if(coordX > 422-3 && coordX < 422+3){return 48600} //13h30
-    if(coordX > 439-3 && coordX < 439+3){return 49500} //13h45
-    if(coordX > 563-3 && coordX < 563+3){return 56700} //15h45
-    if(coordX > 596-3 && coordX < 606+3){return 57600} //16h00
-    if(coordX > 628-3 && coordX < 628+3){return 60300} //16h45
-    if(coordX > 709-3 && coordX < 709+3){return 64800} //18h00
-    if(coordX > 749-3 && coordX < 749+3){return 67500} //19h00
-    if(coordX > 764-3 && coordX < 767+3){return 68400} //19h00
+    //On gère nos exceptions
+    if(coordX > 237-3 && coordX < 242+3){return 35100} //09h45
+    if(coordX > 261-3 && coordX < 261+3){return 36000} //10h00
+    if(coordX > 384-3 && coordX < 389+3){return 43200} //12h00
+    if(coordX > 394-3 && coordX < 394+3){return 44100} //12h15
+    if(coordX > 478-3 && coordX < 478+3){return 48600} //13h30
+    if(coordX > 609-3 && coordX < 614+3){return 55800} //15h30
+    if(coordX > 644-3 && coordX < 644+3){return 56700} //15h45
+    if(coordX > 782-3 /*&& coordX < 782+3*/){return 63900} //17h45
     
     //Sinon on utilise une fonction polynomiale de degrès 4
     return  0.00000019513359 * Math.pow(coordX, 4)

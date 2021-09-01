@@ -56,7 +56,7 @@ Date.prototype.isBetween = async function(ignorePeriods){
     let retour = false
 
     var date = new Date(this.valueOf())
-    for await(period of ignorePeriods){
+    for(const period of ignorePeriods){
         if(period.dateDebut-date < 0 && period.dateFin-date > 0){
             retour = true
         }
@@ -96,7 +96,7 @@ async function deleteGoogleCalendar(semaines){
                 }while(redo)
             }else if(json.description && json.description.startsWith("#NoDelete")){
                 for(const semaine of semaines){
-                    cours = await semaine.removeCours(json.summary, json.start.dateTime)
+                    await semaine.removeCours(json.summary, json.start.dateTime)
                 }
             }
         }
@@ -110,7 +110,7 @@ async function insertGoogleCalendar(semaines){
     let dateAjd = new Date()
     let annee = dateAjd.getFullYear()
 
-    const ignorePeriods = await getIgnorePeriods()
+    const ignorePeriods = getIgnorePeriods()
 
     for(const semaine of semaines){
         let cptJour = 0
@@ -172,7 +172,7 @@ async function getIgnorePeriods(){
     const sheet = doc.sheetsByIndex[0]
     const rows = await sheet.getRows()
 
-    for await(row of rows){
+    for(const row of rows){
         const dateDebut = new Date( row.Date_Debut.slice(-4), 
                                     parseInt(row.Date_Debut.slice(3, 5))-1,
                                     row.Date_Debut.slice(0, 2),

@@ -80,7 +80,7 @@ module.exports = class Cours{
             this.#nextCoordX = 1000000
         }
 
-        if(titre.includes("Sport") || titre.includes("sauf alt")){
+        if(titre.includes("Sport") || titre.includes("sauf alt") || titre == "Langues"){
             this.#coursIng = true
             this.#coursAlt = false
         }

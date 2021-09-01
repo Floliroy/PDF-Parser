@@ -77,10 +77,7 @@ module.exports = class Jour{
         let retour = null
         this.#cours.forEach(function(cours){
             if(cours.getStartCoordX() - coordX < difference && cours.getStartCoordX() - coordX > 120){
-                if(!cours.isProfInName()){
-                    difference = cours.getStartCoordX() - coordX
-                    retour = cours.getStartCoordX()
-                }else if(cours.getStartCoordY()-1.5 < coordY && cours.getStartCoordY()+1.5 > coordY){
+                if(!cours.isProfInName() || (cours.getStartCoordY()-1.5 < coordY && cours.getStartCoordY()+1.5 > coordY)){
                     difference = cours.getStartCoordX() - coordX
                     retour = cours.getStartCoordX()
                 }
@@ -156,6 +153,6 @@ module.exports = class Jour{
         return this.#coordY + 18
     }
     getCours(){
-        return new Promise((resolve) => resolve(this.#cours))
+        return this.#cours
     }
 }
