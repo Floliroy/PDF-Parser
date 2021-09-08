@@ -113,16 +113,16 @@ module.exports = class Cours{
      * Récupère l'heure de début du cours
      */
     getHeureDebut(){
-        return ParseCoord.coordToHeure(this.#coordX, 0, "M2")
+        return ParseCoord.coordToHeure(this.#coordX, 0)
     }
     /**
      * Récupère l'heure de fin du cours
      */
     getHeureFin(){
         if(this.getEndOfCase()){
-            return ParseCoord.coordToHeure(this.#endOfCase, 0, "M2")
+            return ParseCoord.coordToHeure(this.#endOfCase, 0)
         }else{
-            return ParseCoord.coordToHeure(this.#coordX, 2, "M2")
+            return ParseCoord.coordToHeure(this.#coordX, 2)
         }
     }
 

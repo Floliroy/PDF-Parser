@@ -17,7 +17,6 @@ const urlPdf = "https://stri.fr/Gestion_STRI/TAV/M2/EDT_STRI3A_M2STRI.pdf"
  * Personnal globals
  */
 const Semaine = require('./../classes/semaine.js')
-const ParseCoord = require('./parseCoord.js')
 
 const redNode = "\x1b[31m"
 const blueNode = "\x1b[36m"
@@ -33,7 +32,7 @@ module.exports = class ExtractDatasPDF{
             //On récupère la version du pdf actuel
             const prevVersion = getVersion()
     
-            //await downloadPDF(urlPdf, "EDT.pdf")
+            await downloadPDF(urlPdf, "EDT.pdf")
             console.log(blueNode, "PDF Downloaded", resetNode)
             
             //On récupère la nouvelle version du pdf
@@ -66,8 +65,6 @@ async function extractDatas(semaines){
     try{
         const data = await pdfExtract.extract("EDT.pdf", {})
 
-        ParseCoord.loadDatas(data.pages[0].content, "M2")
-        
         for(let i=0 ; i<1 ; i++){
             let elements = data.pages[i].content
             elements = elements.sort(function(a, b){
@@ -99,7 +96,7 @@ async function extractDatas(semaines){
                                                 let coursModif = semaine.getDernierJour().getCoursEntreCoord(warning.x, warning.y)
                                                 if(coursModif.getLieu() == ""){
                                                     coursModif.setLieu(warning.str)
-                                                    coursModif.setEndOfCase(warning.x + warning.width + warning.str.length<5?5:0)
+                                                    coursModif.setEndOfCase(warning.x + warning.width)
                                                     if(coursModif.getStartCoordY()-1 < warning.y && coursModif.getStartCoordY()+1 > warning.y){ //Cours et lieu sur la meme coordY
 
                                                         let otherCours = semaine.getJourEntreCoord(warning.y).getOtherCoursParDebut(coursModif)
@@ -159,7 +156,7 @@ async function extractDatas(semaines){
                                         let coursModif = await semaine.getJourEntreCoord(elem.y).getCoursEntreCoord(elem.x, elem.y)
                                         if(coursModif.getLieu() == ""){
                                             coursModif.setLieu(elem.str)
-                                            coursModif.setEndOfCase(elem.x + elem.width + elem.str.length<5?5:0)
+                                            coursModif.setEndOfCase(elem.x + elem.width)
         
                                             if(coursModif.getStartCoordY()-1 < elem.y && coursModif.getStartCoordY()+1 > elem.y){ //Cours et lieu sur la meme coordY
 
@@ -188,9 +185,7 @@ async function extractDatas(semaines){
                                     if(dernierJour.getDernierCours() && dernierJour.getDernierCours().getNextCoordX() == 1000000){
                                         dernierJour.getDernierCours().setNextCoordX(elem.x)
                                     }
-                                    if(!elem.str.includes("Projet")){
-                                        dernierJour.addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
-                                    }
+                                    dernierJour.addCours(elem.str, elem.x, elem.y, elem.width, elem.height)
                                 }
                             }
         
