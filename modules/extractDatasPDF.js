@@ -33,7 +33,7 @@ module.exports = class ExtractDatasPDF{
             //On récupère la version du pdf actuel
             const prevVersion = getVersion()
     
-            //await downloadPDF(urlPdf, "EDT.pdf")
+            await downloadPDF(urlPdf, "EDT.pdf")
             console.log(blueNode, "PDF Downloaded", resetNode)
             
             //On récupère la nouvelle version du pdf
